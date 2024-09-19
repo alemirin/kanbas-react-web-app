@@ -310,7 +310,10 @@ export default function Lab1() {
       <br />
       <h4>Github</h4>
       To access github repo:
-      <a id="wd-github" href="https://www.lipsum.com">
+      <a
+        id="wd-github"
+        href="https://github.com/alemirin/kanbas-react-web-app.git"
+      >
         github
       </a>
       <br />
