@@ -1,7 +1,29 @@
 import "./index.css";
+
+import { Routes, Route, Navigate } from "react-router-dom";
+import Lab2Navigation from "./Navigation";
+import ForegroundColors from "./ForegroundColors";
+import BackgroundColors from "./BackgroundColors";
+import Borders from "./Borders";
+import Corners from "./Corners";
+import Dimensions from "./Dimensions";
+import Margins from "./Margins";
+import Padding from "./Padding";
+import Positions from "./Positions";
+import Zindex from "./Zindex";
+import Float from "./Float";
+import GridLayout from "./GridLayout";
+import Flex from "./Flex";
+import ReactIconsSampler from "./ReactIcons";
+import BootstrapGrids from "./BootstrapGrids";
+import ScreenSizeLabel from "./ScreenSizeLabel";
+import BootstrapTables from "./BootstrapTables";
+import BootstrapLists from "./BootstrapLists";
+import BootstrapForms from "./BootstrapForms";
+
 export default function Lab2() {
   return (
-    <div id="wd-lab2">
+    <div className="container">
       <h2>Lab 2 - Cascading Style Sheets</h2>
       <h3>Styling with the STYLE attribute</h3>
       <div id="wd-css-id-selectors">
@@ -47,6 +69,36 @@ export default function Lab2() {
           </div>
         </div>
       </div>
+      <table>
+        <tr>
+          <td valign="top">
+            <Lab2Navigation />
+          </td>
+          <td valign="top">
+            <Routes>
+              <Route path="/" element={<Navigate to="/Labs/Lab2" />} />
+              <Route path="ForegroundColors" element={<ForegroundColors />} />
+              <Route path="BackgroundColors" element={<BackgroundColors />} />
+              <Route path="Corners" element={<Corners />} />
+              <Route path="Borders" element={<Borders />} />
+              <Route path="Margins" element={<Margins />} />
+              <Route path="Padding" element={<Padding />} />
+              <Route path="Dimensions" element={<Dimensions />} />
+              <Route path="Positions" element={<Positions />} />
+              <Route path="Zindex" element={<Zindex />} />
+              <Route path="Float" element={<Float />} />
+              <Route path="GridLayout" element={<GridLayout />} />
+              <Route path="Flex" element={<Flex />} />
+              <Route path="ReactIcons" element={<ReactIconsSampler />} />
+              <Route path="BootstrapGrid" element={<BootstrapGrids />} />
+              <Route path="ScreenSizeLabel" element={<ScreenSizeLabel />} />
+              <Route path="BootstrapTables" element={<BootstrapTables />} />
+              <Route path="BootstrapLists" element={<BootstrapLists />} />
+              <Route path="BootstrapForms" element={<BootstrapForms />} />
+            </Routes>
+          </td>
+        </tr>
+      </table>
     </div>
   );
 }
