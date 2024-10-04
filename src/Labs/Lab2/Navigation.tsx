@@ -74,6 +74,10 @@ export default function Lab2Navigation() {
         Bootstrap Forms
       </Link>
       <br />
+      <Link to={"/Labs/Lab2/BootstrapNavigation"} id="wd-bs-nav-link">
+        Bootstrap Navigation
+      </Link>
+      <br />
     </div>
   );
 }
