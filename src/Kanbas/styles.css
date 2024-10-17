@@ -33,3 +33,13 @@ body * {
 .wd-lesson {
   border-left: 3px solid green !important;
 }
+
+#pill {
+  background-color: #ddd;
+  border: black;
+  color: black;
+  padding: 6px 6px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 16px;
+}

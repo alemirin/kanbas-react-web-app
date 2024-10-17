@@ -3,7 +3,7 @@ export default function AssignmentControls() {
   return (
     <div
       id="wd-assignment-controls"
-      className="text-nowrap d-flex flex-row-reverse"
+      className="text-nowrap d-flex flex-row-reverse gap-2"
     >
       <button
         id="wd-add-assignment-btn"
@@ -21,7 +21,7 @@ export default function AssignmentControls() {
       </button>
       <input
         id="wd-search-assignment"
-        className="search-input"
+        className="search-input rounded"
         type="search"
         placeholder="&#128270; Search..."
       />
