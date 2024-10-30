@@ -20,7 +20,7 @@ export default function TodoItem({ todo }: TodoItemProps) {
         <button
           onClick={() => dispatch(deleteTodo(todo.id))}
           id="wd-delete-todo-click"
-          className="btn btn-danger order-3"
+          className="btn btn-danger order-3 ms-2"
         >
           Delete{" "}
         </button>
