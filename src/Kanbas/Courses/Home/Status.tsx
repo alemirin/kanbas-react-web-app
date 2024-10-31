@@ -4,24 +4,27 @@ import { BiImport } from "react-icons/bi";
 import { LiaFileImportSolid } from "react-icons/lia";
 import { CgLoadbarSound } from "react-icons/cg";
 import { IoCalendarOutline } from "react-icons/io5";
+import FacultyRoute from "../../Account/FacultyRoute";
 import { IoNotificationsOutline } from "react-icons/io5";
 
 export default function CourseStatus() {
   return (
     <div id="wd-course-status" style={{ width: "300px" }}>
       <h2>Course Status</h2>
-      <div className="d-flex">
-        <div className="w-50 pe-1">
-          <button className="btn btn-lg btn-secondary w-100 text-nowrap ">
-            <MdDoNotDisturbAlt className="me-2 fs-5" /> Unpublish{" "}
-          </button>
+      <FacultyRoute>
+        <div className="d-flex">
+          <div className="w-50 pe-1">
+            <button className="btn btn-lg btn-secondary w-100 text-nowrap ">
+              <MdDoNotDisturbAlt className="me-2 fs-5" /> Unpublish{" "}
+            </button>
+          </div>
+          <div className="w-50">
+            <button className="btn btn-lg btn-success w-100">
+              <FaCheckCircle className="me-2 fs-5" /> Publish{" "}
+            </button>
+          </div>
         </div>
-        <div className="w-50">
-          <button className="btn btn-lg btn-success w-100">
-            <FaCheckCircle className="me-2 fs-5" /> Publish{" "}
-          </button>
-        </div>
-      </div>
+      </FacultyRoute>
       <br />
       <button className="btn btn-lg btn-secondary w-100 mt-1 text-start">
         <BiImport className="me-2 fs-5" /> Import Existing Content{" "}

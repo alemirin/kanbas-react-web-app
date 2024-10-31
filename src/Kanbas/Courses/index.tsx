@@ -1,4 +1,5 @@
 import CoursesNavigation from "./Navigation";
+import FacultyRoute from "../Account/FacultyRoute";
 import Modules from "./Modules";
 import Home from "./Home";
 import Assignments from "./Assignments";
@@ -28,7 +29,14 @@ export default function Courses({ courses }: { courses: any[] }) {
             <Route path="Home" element={<Home />} />
             <Route path="Modules" element={<Modules />} />
             <Route path="Assignments" element={<Assignments />} />
-            <Route path="Assignments/:aid" element={<AssignmentEditor />} />
+            <Route
+              path="Assignments/:aid"
+              element={
+                <FacultyRoute>
+                  <AssignmentEditor />
+                </FacultyRoute>
+              }
+            />
             <Route path="People" element={<PeopleTable />} />
           </Routes>
         </div>

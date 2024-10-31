@@ -1,6 +1,8 @@
 import ModuleEditor from "./ModuleEditor";
 import { FaPlus } from "react-icons/fa6";
+import { FaTrash } from "react-icons/fa";
 import GreenCheckmark from "./GreenCheckmark";
+import FacultyRoute from "../../Account/FacultyRoute";
 export default function ModulesControls({
   moduleName,
   setModuleName,
@@ -11,26 +13,33 @@ export default function ModulesControls({
   addModule: () => void;
 }) {
   return (
-    <div id="wd-modules-controls" className="text-nowrap">
-      <button
-        id="wd-add-module-btn"
-        className="btn btn-md btn-danger me-1 float-end"
-        data-bs-toggle="modal"
-        data-bs-target="#wd-add-module-dialog"
-      >
-        <FaPlus className="position-relative me-2" style={{ bottom: "1px" }} />
-        Module
-      </button>
-      <div className="dropdown d-inline me-1 float-end">
+    <div id="wd-modules-controls" className="w-100 mw-75">
+      <FacultyRoute>
         <button
-          id="wd-publish-all-btn"
-          className="btn btn-md btn-secondary dropdown-toggle"
-          type="button"
-          data-bs-toggle="dropdown"
+          id="wd-add-module-btn"
+          className="btn btn-md btn-danger me-1 float-end"
+          data-bs-toggle="modal"
+          data-bs-target="#wd-add-module-dialog"
         >
-          <GreenCheckmark />
-          Publish All
+          <FaPlus
+            className="position-relative me-2"
+            style={{ bottom: "1px" }}
+          />
+          Module
         </button>
+      </FacultyRoute>
+      <div className="dropdown d-inline me-1 float-end">
+        <FacultyRoute>
+          <button
+            id="wd-publish-all-btn"
+            className="btn btn-md btn-secondary dropdown-toggle"
+            type="button"
+            data-bs-toggle="dropdown"
+          >
+            <GreenCheckmark />
+            Publish All
+          </button>
+        </FacultyRoute>
         <ul className="dropdown-menu">
           <li>
             <a

@@ -4,7 +4,7 @@ export default function LessonControlButtons() {
   return (
     <div className="d-flex float-end align-self-center gap-3">
       <GreenCheckmark />
-      <IoEllipsisVertical className="fs-4" />
+      <IoEllipsisVertical className="fs-4 hoverable-icon" />
     </div>
   );
 }

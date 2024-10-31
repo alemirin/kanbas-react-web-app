@@ -43,3 +43,12 @@ body * {
   text-decoration: none;
   border-radius: 16px;
 }
+
+.hoverable-icon {
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.hoverable-icon:hover {
+  color: #007bff; /* Change to the desired color */
+  transform: scale(1.1); /* Slightly increase size on hover */
+}
