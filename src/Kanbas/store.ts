@@ -6,7 +6,8 @@ const store = configureStore({
   reducer: {
     modulesReducer,
     accountReducer,
-    assignmentReducer,
+    assignments: assignmentReducer,
   },
 });
+export type RootState = ReturnType<typeof store.getState>;
 export default store;

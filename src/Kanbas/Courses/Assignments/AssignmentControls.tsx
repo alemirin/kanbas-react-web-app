@@ -1,6 +1,10 @@
 import { FaPlus } from "react-icons/fa6";
 import FacultyRoute from "../../Account/FacultyRoute";
+import { useNavigate, useParams } from "react-router";
+
 export default function AssignmentControls() {
+  const { cid } = useParams();
+  const navigate = useNavigate();
   return (
     <div
       id="wd-assignment-controls"
@@ -10,6 +14,7 @@ export default function AssignmentControls() {
         <button
           id="wd-add-assignment-btn"
           className="btn btn-lg btn-danger me-1 float-end"
+          onClick={() => navigate(`/Kanbas/Courses/${cid}/Assignments/new`)}
         >
           <FaPlus
             className="position-relative me-2"

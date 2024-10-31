@@ -1,20 +1,62 @@
-import { useParams } from "react-router";
-import { Link } from "react-router-dom"; // Import useParams and Link
-import * as db from "../../Database";
+import { useParams, useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { useState, useEffect } from "react";
+import { RootState } from "../../store";
+import { addAssignment, updateAssignment } from "./reducer";
 
 export default function AssignmentEditor() {
   const { cid, aid } = useParams(); // Get course ID (cid) and assignment ID (aid) from URL
-  const assignments = db.assignments;
-
-  // Find the assignment based on course ID and assignment ID
-  const assignment = assignments.find(
-    (assignment) => assignment.course === cid && assignment._id === aid
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isNew = !aid;
+  const existingAssignment = useSelector((state: RootState) =>
+    state.assignments.assignments.find((a) => a._id === aid)
   );
 
-  // Handle case if assignment is not found
-  if (!assignment) {
-    return <div>Assignment not found</div>;
-  }
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [points, setPoints] = useState(0);
+  const [due, setDue] = useState("");
+  const [group, setGroup] = useState("");
+  const [availFrom, setAvailFrom] = useState("");
+  const [availUntil, setAvailUntil] = useState("");
+
+  useEffect(() => {
+    if (existingAssignment && !isNew) {
+      setTitle(existingAssignment.title);
+      setDescription(existingAssignment.description);
+      setPoints(parseInt(existingAssignment.points));
+      setDue(existingAssignment.due);
+      setAvailFrom(existingAssignment.availFrom);
+      setGroup(existingAssignment.group);
+      setAvailUntil(existingAssignment.availUntil);
+    }
+  }, [existingAssignment, isNew]);
+
+  const handleSave = () => {
+    const assignment = {
+      _id: isNew ? new Date().getTime().toString() : aid,
+      course: cid,
+      title,
+      description,
+      points,
+      group,
+      due,
+      avail: availFrom,
+      availUntil,
+    };
+    if (isNew) {
+      dispatch(addAssignment(assignment));
+    } else {
+      dispatch(updateAssignment(assignment));
+    }
+    navigate(`/Kanbas/Courses/${cid}/Assignments`);
+  };
+
+  const handleCancel = () => {
+    navigate(`/Kanbas/Courses/${cid}/Assignments`);
+  };
+
   return (
     <div id="wd-assignments-editor" className="container mt-4">
       <div className="mb-3">
@@ -23,7 +65,9 @@ export default function AssignmentEditor() {
         </label>
         <input
           id="wd-name"
-          value={assignment.title}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Assignment Title"
           className="form-control"
           type="text"
         />
@@ -40,7 +84,9 @@ export default function AssignmentEditor() {
           rows={10}
           id="wd-description"
           className="form-control"
-          defaultValue={assignment.description}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Description"
         />
       </div>
       <br />
@@ -54,9 +100,11 @@ export default function AssignmentEditor() {
         <div className="col">
           <input
             id="wd-points"
-            value={assignment.points}
+            value={points}
             className="form-control"
             type="number"
+            onChange={(e) => setPoints(Number(e.target.value))}
+            placeholder="Points"
           />
         </div>
       </div>
@@ -70,7 +118,7 @@ export default function AssignmentEditor() {
           <select
             id="wd-select-assignment-group"
             className="form-select col"
-            defaultValue={assignment.group}
+            value={group}
           >
             <option value="ASSIGNMENTS">ASSIGNMENTS</option>
             <option value="QUIZZES">QUIZZES</option>
@@ -209,7 +257,8 @@ export default function AssignmentEditor() {
                   name="select-due-date"
                   id="wd-select-due-date"
                   className="form-control"
-                  defaultValue="2024-05-13T23:59"
+                  value={due}
+                  onChange={(e) => setDue(e.target.value)}
                 />
               </div>
             </div>
@@ -224,7 +273,8 @@ export default function AssignmentEditor() {
                   name="available-from-date"
                   id="wd-select-available-from-date"
                   className="form-control"
-                  defaultValue="2024-05-06T00:00"
+                  value={availFrom}
+                  onChange={(e) => setAvailFrom(e.target.value)}
                 />
               </div>
               <div className="col-md-6">
@@ -239,6 +289,8 @@ export default function AssignmentEditor() {
                   name="available-until-date"
                   id="wd-select-available-until-date"
                   className="form-control"
+                  value={availUntil}
+                  onChange={(e) => setAvailUntil(e.target.value)}
                 />
               </div>
             </div>
@@ -252,20 +304,20 @@ export default function AssignmentEditor() {
         id="wd-edit-assignment-buttons"
         className="d-flex justify-content-end"
       >
-        <Link
-          to={`/Kanbas/Courses/${cid}/Assignments`}
+        <button
+          onClick={handleCancel}
           id="wd-cancel-edit-assignment"
           className="btn btn-secondary me-2"
         >
           Cancel
-        </Link>
-        <Link
-          to={`/Kanbas/Courses/${cid}/Assignments`}
+        </button>
+        <button
+          onClick={handleSave}
           id="wd-save-edit-assignment"
           className="btn btn-primary"
         >
           Save
-        </Link>
+        </button>
       </div>
     </div>
   );

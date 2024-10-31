@@ -13,7 +13,7 @@ export default function AssignmentControlButtons() {
       <FacultyRoute>
         <FaPlus className="fs-4 align-self-center hoverable-icon" />
       </FacultyRoute>
-      <IoEllipsisVertical className="fs-4 align-self-center" />
+      <IoEllipsisVertical className="fs-4 align-self-center hoverable-icon" />
     </div>
   );
 }

@@ -7,27 +7,33 @@ const assSlice = createSlice({
   name: "assignments",
   initialState,
   reducers: {
-    addAssignment: (state, { payload: module }) => {
+    addAssignment: (state, { payload: assignment }) => {
       const newAssignment: any = {
         _id: new Date().getTime().toString(),
-        name: module.name,
-        course: module.course,
+        title: assignment.title,
+        course: assignment.course,
+        description: assignment.description,
+        availFrom: assignment.availFrom,
+        availUntil: assignment.availUntil,
+        due: assignment.due,
+        points: assignment.points,
+        group: assignment.group,
       };
       state.assignments = [...state.assignments, newAssignment] as any;
     },
-    deleteAssignment: (state, { payload: moduleId }) => {
-      state.assignments = state.assignments.filter(
-        (m: any) => m._id !== moduleId
-      );
+    deleteAssignment: (state, { payload: assId }) => {
+      state.assignments = state.assignments.filter((a: any) => a._id !== assId);
     },
-    updateAssignment: (state, { payload: module }) => {
-      state.assignments = state.assignments.map((m: any) =>
-        m._id === module._id ? module : m
+    updateAssignment: (state, { payload: assignment }) => {
+      state.assignments = state.assignments.map((a: any) =>
+        a._id === assignment._id
+          ? { ...assignment, availUntil: assignment.availUntil }
+          : a
       ) as any;
     },
-    editAssignment: (state, { payload: moduleId }) => {
-      state.assignments = state.assignments.map((m: any) =>
-        m._id === moduleId ? { ...m, editing: true } : m
+    editAssignment: (state, { payload: assId }) => {
+      state.assignments = state.assignments.map((a: any) =>
+        a._id === assId ? { ...a, editing: true } : a
       ) as any;
     },
   },

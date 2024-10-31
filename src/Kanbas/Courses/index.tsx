@@ -30,7 +30,15 @@ export default function Courses({ courses }: { courses: any[] }) {
             <Route path="Modules" element={<Modules />} />
             <Route path="Assignments" element={<Assignments />} />
             <Route
-              path="Assignments/:aid"
+              path="Assignments/:aid/edit"
+              element={
+                <FacultyRoute>
+                  <AssignmentEditor />
+                </FacultyRoute>
+              }
+            />
+            <Route
+              path="Assignments/new"
               element={
                 <FacultyRoute>
                   <AssignmentEditor />

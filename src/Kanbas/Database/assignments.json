@@ -4,50 +4,55 @@
     "title": "Propulsion Assignment",
     "course": "RS101",
     "description": "Calculate the propulsion",
-    "avail": "May 6 2024",
+    "availFrom": "May 6 2024",
     "due": "May 13 2024",
     "points": "50",
-    "group": "ASSIGNMENT"
+    "group": "ASSIGNMENT",
+    "availUntil": ""
   },
   {
     "_id": "A102",
     "title": "Combustion Analysis",
     "course": "RS101",
     "description": "Calculate the combustion",
-    "avail": "May 13 2024",
+    "availFrom": "May 13 2024",
     "due": "May 20 2024",
     "points": "70",
-    "group": "ASSIGNMENT"
+    "group": "ASSIGNMENT",
+    "availUntil": ""
   },
   {
     "_id": "A103",
     "title": "Turbulent Combustion",
     "course": "RS101",
     "description": "Calculate the turbulent propulsion",
-    "avail": "May 20 2024",
+    "availFrom": "May 20 2024",
     "due": "May 27 2024",
     "points": "70",
-    "group": "EXAM"
+    "group": "EXAM",
+    "availUntil": ""
   },
   {
     "_id": "A104",
     "title": "Nozzle Design Project",
     "course": "RS101",
     "description": "Calculate the nozzle dimensions",
-    "avail": "June 6 2024",
+    "availFrom": "June 6 2024",
     "due": "June 15 2024",
     "points": "100",
-    "group": "EXAM"
+    "group": "EXAM",
+    "availUntil": ""
   },
   {
     "_id": "A105",
     "title": "Design Presentation",
     "course": "RS101",
     "description": "Present your nozzles",
-    "avail": "June 15 2024",
+    "availFrom": "June 15 2024",
     "due": "June 22 2024",
     "points": "100",
-    "group": "EXAM"
+    "group": "EXAM",
+    "availUntil": ""
   },
 
   {
@@ -55,40 +60,44 @@
     "title": "Aerodynamics Quiz",
     "course": "RS102",
     "description": "Aerodynamics",
-    "avail": "May 6 2024",
+    "availFrom": "May 6 2024",
     "due": "May 13 2024",
     "points": "30",
-    "group": "QUIZ"
+    "group": "QUIZ",
+    "availUntil": ""
   },
   {
     "_id": "A202",
     "title": "Creating Simulated Models",
     "course": "RS102",
     "description": "We are in a simulation",
-    "avail": "May 13 2024",
+    "availFrom": "May 13 2024",
     "due": "May 20 2024",
     "points": "20",
-    "group": "ASSIGNMENT"
+    "group": "ASSIGNMENT",
+    "availUntil": ""
   },
   {
     "_id": "A203",
     "title": "Flow Analysis",
     "course": "RS102",
     "description": "Analyze my flow",
-    "avail": "May 20 2024",
+    "availFrom": "May 20 2024",
     "due": "May 27 2024",
     "points": "100",
-    "group": "ASSIGNMENT"
+    "group": "ASSIGNMENT",
+    "availUntil": ""
   },
   {
     "_id": "A204",
     "title": "Heating Analysis",
     "course": "RS102",
     "description": "Heating up",
-    "avail": "June 6 2024",
+    "availFrom": "June 6 2024",
     "due": "June 15 2024",
     "points": "100",
-    "group": "ASSIGNMENT"
+    "group": "ASSIGNMENT",
+    "availUntil": ""
   },
 
   {
@@ -96,30 +105,33 @@
     "title": "Structural Design Task",
     "course": "RS103",
     "description": "Description not yet available",
-    "avail": "May 6 2024",
+    "availFrom": "May 6 2024",
     "due": "May 13 2024",
     "points": "10",
-    "group": "ASSIGNMENT"
+    "group": "ASSIGNMENT",
+    "availUntil": ""
   },
   {
     "_id": "A302",
     "title": "Orbital Calculations",
     "course": "RS103",
     "description": "Description not yet available",
-    "avail": "May 13 2024",
+    "availFrom": "May 13 2024",
     "due": "May 20 2024",
     "points": "40",
-    "group": "QUIZ"
+    "group": "QUIZ",
+    "availUntil": ""
   },
   {
     "_id": "A303",
     "title": "Systems Engineering Exam",
     "course": "RS103",
     "description": "Description not yet available",
-    "avail": "May 20 2024",
+    "availFrom": "May 20 2024",
     "due": "May 27 2024",
     "points": "100",
-    "group": "EXAM"
+    "group": "EXAM",
+    "availUntil": ""
   },
 
   {
@@ -127,30 +139,33 @@
     "title": "Topics in Spell Incantations",
     "course": "RS104",
     "description": "Description not yet available",
-    "avail": "May 6 2024",
+    "availFrom": "May 6 2024",
     "due": "May 13 2024",
     "points": "50",
-    "group": "ASSIGNMENT"
+    "group": "ASSIGNMENT",
+    "availUntil": ""
   },
   {
     "_id": "A402",
     "title": "Ethics for Young Wizards",
     "course": "RS104",
     "description": "Description not yet available",
-    "avail": "May 13 2024",
+    "availFrom": "May 13 2024",
     "due": "May 20 2024",
     "points": "10",
-    "group": "QUIZ"
+    "group": "QUIZ",
+    "availUntil": ""
   },
   {
     "_id": "A403",
     "title": "Orc Task",
     "course": "RS104",
     "description": "Description not yet available",
-    "avail": "May 20 2024",
+    "availFrom": "May 20 2024",
     "due": "May 27 2024",
     "points": "70",
-    "group": "ASSIGNMENT"
+    "group": "ASSIGNMENT",
+    "availUntil": ""
   },
 
   {
@@ -158,30 +173,33 @@
     "title": "Creating your Staff",
     "course": "RS104",
     "description": "Description not yet available",
-    "avail": "June 6 2024",
+    "availFrom": "June 6 2024",
     "due": "June 15 2024",
     "points": "40",
-    "group": "ASSIGNMENT"
+    "group": "ASSIGNMENT",
+    "availUntil": ""
   },
   {
     "_id": "A405",
     "title": "Elf Quest",
     "course": "RS104",
     "description": "Description not yet available",
-    "avail": "June 15 2024",
+    "availFrom": "June 15 2024",
     "due": "June 22 2024",
     "points": "80",
-    "group": "ASSIGNMENT"
+    "group": "ASSIGNMENT",
+    "availUntil": ""
   },
   {
     "_id": "A406",
     "title": "Wizard Practical Exam",
     "course": "RS104",
     "description": "Description not yet available",
-    "avail": "June 22 2024",
+    "availFrom": "June 22 2024",
     "due": "June 23 2024",
     "points": "100",
-    "group": "EXAM"
+    "group": "EXAM",
+    "availUntil": ""
   },
 
   {
@@ -189,29 +207,32 @@
     "title": "Ionic and Covalent Bonds",
     "course": "RS105",
     "description": "Description not yet available",
-    "avail": "May 6 2024",
+    "availFrom": "May 6 2024",
     "due": "May 13 2024",
     "points": "50",
-    "group": "QUIZ"
+    "group": "QUIZ",
+    "availUntil": ""
   },
   {
     "_id": "A502",
     "title": "Creating Explosives",
     "course": "RS105",
     "description": "Description not yet available",
-    "avail": "May 13 2024",
+    "availFrom": "May 13 2024",
     "due": "May 20 2024",
     "points": "100",
-    "group": "ASSIGNMENT"
+    "group": "ASSIGNMENT",
+    "availUntil": ""
   },
   {
     "_id": "A503",
     "title": "Electron Orbitals",
     "course": "RS105",
     "description": "Description not yet available",
-    "avail": "May 20 2024",
+    "availFrom": "May 20 2024",
     "due": "May 27 2024",
     "points": "100",
-    "group": "EXAM"
+    "group": "EXAM",
+    "availUntil": ""
   }
 ]
