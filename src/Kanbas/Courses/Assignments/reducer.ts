@@ -3,7 +3,7 @@ import { assignments } from "../../Database";
 const initialState = {
   assignments: assignments,
 };
-const assSlice = createSlice({
+const assignmentSlice = createSlice({
   name: "assignments",
   initialState,
   reducers: {
@@ -43,5 +43,5 @@ export const {
   deleteAssignment,
   updateAssignment,
   editAssignment,
-} = assSlice.actions;
-export default assSlice.reducer;
+} = assignmentSlice.actions;
+export default assignmentSlice.reducer;

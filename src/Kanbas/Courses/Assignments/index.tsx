@@ -8,6 +8,7 @@ import {
   MdExpandMore,
   MdExpandLess,
 } from "react-icons/md";
+
 import { BsGripVertical } from "react-icons/bs";
 import { useParams, useLocation } from "react-router";
 import { useState } from "react";
@@ -15,6 +16,8 @@ import { RootState } from "../../store";
 
 import { useSelector, useDispatch } from "react-redux";
 import { deleteAssignment } from "./reducer";
+import FacultyRoute from "../../Account/FacultyRoute";
+import StudentRoute from "../../Account/StudentRoute";
 
 export default function Assignments() {
   interface Assignment {
@@ -33,7 +36,7 @@ export default function Assignments() {
 
   const { cid } = useParams();
   const assignments = useSelector(
-    (state: RootState) => state.assignments.assignments
+    (state: RootState) => state.assignmentReducer.assignments
   );
 
   const [isExpanded, setIsExpanded] = useState(true);
@@ -85,20 +88,35 @@ export default function Assignments() {
                 .filter((assignment: any) => assignment.course === cid)
                 .map((assignment: any) => (
                   <li className="wd-lesson list-group-item p-3 ps-1 d-flex gap-4">
-                    <a
-                      className="wd-assignment-link d-flex align-items-start"
-                      href={`#/Kanbas/Courses/${cid}/Assignments/${assignment._id}/edit`}
-                    >
-                      <BsGripVertical className="me-2 fs-3 align-self-center" />
-                      <MdOutlineAssignment className="fs-1 text text-success align-self-center" />
-                    </a>
-                    <div>
+                    <FacultyRoute>
                       <a
-                        className="align-self-start h4 fw-bold mt-3"
+                        className="wd-assignment-link d-flex align-items-start"
                         href={`#/Kanbas/Courses/${cid}/Assignments/${assignment._id}/edit`}
                       >
-                        {assignment.title}
+                        <BsGripVertical className="me-2 fs-3 align-self-center" />
+                        <MdOutlineAssignment className="fs-1 text text-success align-self-center" />
                       </a>
+                    </FacultyRoute>
+                    <StudentRoute>
+                      <div className="wd-student-assignment-title d-flex align-items-start">
+                        <BsGripVertical className="me-2 fs-3 align-self-center" />
+                        <MdOutlineAssignment className="fs-1 text text-success align-self-center" />
+                      </div>
+                    </StudentRoute>
+                    <div>
+                      <FacultyRoute>
+                        <a
+                          className="align-self-start h4 fw-bold mt-3"
+                          href={`#/Kanbas/Courses/${cid}/Assignments/${assignment._id}/edit`}
+                        >
+                          {assignment.title}
+                        </a>
+                      </FacultyRoute>
+                      <StudentRoute>
+                        <p className="align-self-start h4 fw-bold mt-3">
+                          {assignment.title}
+                        </p>
+                      </StudentRoute>
                       <p className="mt-3">
                         <span className="text-danger"> Multiple Modules </span>|{" "}
                         <b> Not available until</b> {assignment.availUntil} at
@@ -106,10 +124,12 @@ export default function Assignments() {
                         {assignment.points} pts
                       </p>
                     </div>
-                    <SpecificAssignmentButtons
-                      assignmentId={assignment._id}
-                      deleteAssignment={() => handleDeleteClick(assignment)}
-                    />
+                    <FacultyRoute>
+                      <SpecificAssignmentButtons
+                        assignmentId={assignment._id}
+                        deleteAssignment={() => handleDeleteClick(assignment)}
+                      />
+                    </FacultyRoute>
                   </li>
                 ))}
             </ul>

@@ -10,7 +10,7 @@ export default function AssignmentEditor() {
   const dispatch = useDispatch();
   const isNew = !aid;
   const existingAssignment = useSelector((state: RootState) =>
-    state.assignments.assignments.find((a) => a._id === aid)
+    state.assignmentReducer.assignments.find((a) => a._id === aid)
   );
 
   const [title, setTitle] = useState("");

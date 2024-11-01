@@ -8,8 +8,11 @@ import Courses from "./Courses";
 import * as db from "./Database";
 import { useState } from "react";
 import ProtectedRoute from "./Account/ProtectedRoute";
+import { enroll } from "./Enrollments/reducer";
+import { useDispatch } from "react-redux";
 
 export default function Kanbas() {
+  const dispatch = useDispatch();
   const [courses, setCourses] = useState<any[]>(db.courses);
   const [course, setCourse] = useState<any>({
     _id: "0",
@@ -23,6 +26,7 @@ export default function Kanbas() {
   const addNewCourse = () => {
     const newCourse = { ...course, _id: new Date().getTime().toString() };
     setCourses([...courses, { ...course, ...newCourse }]);
+    dispatch(enroll(course._id));
   };
   const deleteCourse = (courseId: string) => {
     setCourses(courses.filter((course) => course._id !== courseId));
