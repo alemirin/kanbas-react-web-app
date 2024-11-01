@@ -118,7 +118,7 @@ export default function Dashboard({
               >
                 <div className="card rounded-3 overflow-hidden">
                   <Link
-                    to={`/Kanbas/Courses/${course._id}/Home`}
+                    to={`#/Kanbas/Courses/${course._id}/Home`}
                     className="wd-dashboard-course-link text-decoration-none text-dark"
                   >
                     <img src={course.image} width="100%" height={160} />
@@ -133,14 +133,12 @@ export default function Dashboard({
                     >
                       {course.description}
                     </p>
-                    <button
-                      onClick={(e) => {
-                        navigate(`/Kanbas/Courses/${course._id}/Home`);
-                      }}
+                    <a
+                      href={`#/Kanbas/Courses/${course._id}/Home`}
                       className="btn btn-primary"
                     >
                       Go
-                    </button>
+                    </a>
                     <FacultyRoute>
                       <button
                         onClick={(event) => {

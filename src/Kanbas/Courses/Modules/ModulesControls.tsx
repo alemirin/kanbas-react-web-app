@@ -3,6 +3,7 @@ import { FaPlus } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
 import GreenCheckmark from "./GreenCheckmark";
 import FacultyRoute from "../../Account/FacultyRoute";
+import { useState } from "react";
 export default function ModulesControls({
   moduleName,
   setModuleName,

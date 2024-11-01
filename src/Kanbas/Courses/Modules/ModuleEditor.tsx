@@ -13,10 +13,12 @@ export default function ModuleEditor({
     <div
       id="wd-add-module-dialog"
       className="modal fade"
+      tabIndex={-1}
       data-bs-backdrop="static"
       data-bs-keyboard="false"
+      aria-hidden="true"
     >
-      <div className="modal-dialog">
+      <div className="modal-dialog" style={{ zIndex: -1 }}>
         <div className="modal-content">
           <div className="modal-header">
             <h1 className="modal-title fs-5" id="staticBackdropLabel">

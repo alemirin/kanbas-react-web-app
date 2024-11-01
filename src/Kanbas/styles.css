@@ -72,3 +72,13 @@ body * {
   width: 300px;
   max-width: 90%;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .modal.fade .modal-dialog {
+    transition: none;
+  }
+}
+
+.modal-backdrop {
+  z-index: -1;
+}
