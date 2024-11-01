@@ -17,8 +17,9 @@ export default function ModuleEditor({
       data-bs-backdrop="static"
       data-bs-keyboard="false"
       aria-hidden="true"
+      style={{ zIndex: 1055, position: "relative" }}
     >
-      <div className="modal-dialog" style={{ zIndex: -1 }}>
+      <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
             <h1 className="modal-title fs-5" id="staticBackdropLabel">
