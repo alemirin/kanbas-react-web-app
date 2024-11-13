@@ -11,7 +11,7 @@ import Lab5 from "./Lab5";
 export default function Labs() {
   return (
     <Provider store={store}>
-      <div>
+      <div className="container-fluid">
         <h1>Labs</h1>
         <h2>Alejandro Miranda | CS5610_Fa_2024_Online</h2>
         <TOC />
