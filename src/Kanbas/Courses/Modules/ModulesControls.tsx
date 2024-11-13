@@ -98,12 +98,14 @@ export default function ModulesControls({
       >
         Collapse All
       </button>
-      <ModuleEditor
-        dialogTitle="Add Module"
-        moduleName={moduleName}
-        setModuleName={setModuleName}
-        addModule={addModule}
-      />
+      <FacultyRoute>
+        <ModuleEditor
+          dialogTitle="Add Module"
+          moduleName={moduleName}
+          setModuleName={setModuleName}
+          addModule={addModule}
+        />
+      </FacultyRoute>
     </div>
   );
 }
