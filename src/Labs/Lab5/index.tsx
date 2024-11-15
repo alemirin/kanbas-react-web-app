@@ -1,4 +1,6 @@
 import PathParameters from "./PathParameters";
+import QueryParameters from "./QueryParameters";
+import WorkingWithObjects from "./WorkingWithObjects";
 
 const REMOTE_SERVER =
   process.env.REACT_APP_REMOTE_SERVER || "http://localhost:4000";
@@ -12,7 +14,10 @@ export default function Lab5() {
       </a>
       <hr />
       Enrionment Variable: {REMOTE_SERVER}
+      <hr />
       <PathParameters />
+      <QueryParameters />
+      <WorkingWithObjects />
     </div>
   );
 }
