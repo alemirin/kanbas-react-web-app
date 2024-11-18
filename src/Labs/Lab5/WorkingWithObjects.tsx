@@ -2,9 +2,27 @@ import React, { useState } from "react";
 const REMOTE_SERVER =
   process.env.REACT_APP_REMOTE_SERVER || "http://localhost:4000";
 export default function WorkingWithObjects() {
+  const [assignment, setAssignment] = useState({
+    id: 1,
+    title: "NodeJS Assignment",
+    description: "Create a NodeJS server with ExpressJS",
+    due: "2021-10-10",
+    completed: false,
+    score: 0,
+  });
+  const ASSIGNMENT_API_URL = `${REMOTE_SERVER}/lab5/assignment`;
+
+  const [module, setModule] = useState({
+    id: 1,
+    name: "Beekeeping",
+    description: "First Module",
+    course: "Web Development",
+  });
+
   return (
     <div id="wd-working-with-objects">
       <h3>Working With Objects</h3>
+      <hr />
       <h4>Retrieving Objects</h4>
       <a
         id="wd-retrieve-assignments"
@@ -13,6 +31,99 @@ export default function WorkingWithObjects() {
       >
         Get Assignment
       </a>
+      <hr />
+      <a
+        id="wd-retrieve-module"
+        className="btn btn-primary"
+        href={`${REMOTE_SERVER}/lab5/module`}
+      >
+        Get Module
+      </a>
+      <hr />
+      <h4>Retrieving Properties</h4>
+      <a
+        id="wd-retrieve-assignment-title"
+        className="btn btn-primary"
+        href={`${REMOTE_SERVER}/lab5/assignment/title`}
+      >
+        Get Assignment Title
+      </a>
+
+      <hr />
+      <a
+        id="wd-retrieve-module-name"
+        className="btn btn-primary"
+        href={`${REMOTE_SERVER}/lab5/module/name`}
+      >
+        Get Module Name
+      </a>
+      <hr />
+      <h4>Modifying Properties</h4>
+      <a
+        id="wd-update-assignment-title"
+        className="btn btn-primary float-end"
+        href={`${ASSIGNMENT_API_URL}/title/${assignment.title}`}
+      >
+        Update Title
+      </a>
+      <input
+        className="form-control w-75"
+        id="wd-assignment-title"
+        defaultValue={assignment.title}
+        onChange={(e) =>
+          setAssignment({ ...assignment, title: e.target.value })
+        }
+      />
+      <hr />
+      <a
+        id="wd-update-assignment-score"
+        className="btn btn-primary float-end"
+        href={`${ASSIGNMENT_API_URL}/score/${assignment.score}`}
+      >
+        Update Score
+      </a>
+      <input
+        className="form-control w-75"
+        type="number"
+        min="0"
+        id="wd-assignment-score"
+        defaultValue={assignment.score}
+        onChange={(e) =>
+          setAssignment({ ...assignment, score: Number(e.target.value) })
+        }
+      />
+      <hr />
+      <div className="d-flex flex-column">
+        <input
+          type="checkbox"
+          id="wd-assignment-checkbox"
+          style={{ transform: "scale(2)" }}
+          onChange={(e) =>
+            setAssignment({ ...assignment, completed: Boolean(e.target.value) })
+          }
+        />
+        <a
+          id="wd-update-assignment-completion"
+          className="btn btn-primary mt-3"
+          href={`${ASSIGNMENT_API_URL}/completed/${assignment.completed}`}
+        >
+          Change Completion
+        </a>
+      </div>
+      <hr />
+      <a
+        id="wd-update-module-name"
+        className="btn btn-primary float-end"
+        href={`${REMOTE_SERVER}/lab5/module/name/${module.name}`}
+      >
+        Update Module Name
+      </a>
+      <input
+        className="form-control w-75"
+        id="wd-assignment-title"
+        value={module.name}
+        onChange={(e) => setModule({ ...module, name: e.target.value })}
+      />
       <hr />
     </div>
   );
