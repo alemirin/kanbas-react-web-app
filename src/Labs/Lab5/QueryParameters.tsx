@@ -50,6 +50,8 @@ export default function QueryParameters() {
         Divide {a} / {b}
       </a>
       <hr />
+      <br />
+      <br />
     </div>
   );
 }

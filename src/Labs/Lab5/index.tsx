@@ -1,5 +1,6 @@
 import PathParameters from "./PathParameters";
 import QueryParameters from "./QueryParameters";
+import WorkingWithArrays from "./WorkingWithArrays";
 import WorkingWithObjects from "./WorkingWithObjects";
 
 const REMOTE_SERVER =
@@ -18,6 +19,7 @@ export default function Lab5() {
       <PathParameters />
       <QueryParameters />
       <WorkingWithObjects />
+      <WorkingWithArrays />
     </div>
   );
 }

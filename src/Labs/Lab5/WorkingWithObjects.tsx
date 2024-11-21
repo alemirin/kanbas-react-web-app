@@ -48,7 +48,6 @@ export default function WorkingWithObjects() {
       >
         Get Assignment Title
       </a>
-
       <hr />
       <a
         id="wd-retrieve-module-name"
@@ -125,6 +124,7 @@ export default function WorkingWithObjects() {
         onChange={(e) => setModule({ ...module, name: e.target.value })}
       />
       <hr />
+      <br /> <br />
     </div>
   );
 }
