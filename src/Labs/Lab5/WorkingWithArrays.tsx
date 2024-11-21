@@ -71,7 +71,7 @@ export default function WorkingWithArrays() {
         href={`${API}/${todo.id}/title/${todo.title}`}
         className="btn btn-primary float-end"
       >
-        Update Todo
+        Update Todo Name
       </a>
       <input
         defaultValue={todo.id}
@@ -85,6 +85,47 @@ export default function WorkingWithArrays() {
       />
       <br />
       <br />
+      <hr />
+      <h4>Updating Array Object Values</h4>
+      <a
+        href={`${API}/${todo.id}/description/${todo.description}`}
+        className="btn btn-primary float-end"
+      >
+        Update Todo Description
+      </a>
+      <input
+        defaultValue={todo.id}
+        className="form-control w-25 float-start me-2"
+        onChange={(e) => setTodo({ ...todo, id: e.target.value })}
+      />
+      <input
+        value={todo.description}
+        className="form-control w-50 float-start"
+        onChange={(e) => setTodo({ ...todo, description: e.target.value })}
+      />
+      <br />
+      <br />
+      <br />
+      <hr />
+      <h4>Updating Todo Completion</h4>
+      <a
+        href={`${API}/${todo.id}/completed/${todo.completed}`}
+        className="btn btn-primary float-end"
+      >
+        Update Todo Completion
+      </a>
+      <input
+        defaultValue={todo.id}
+        className="form-control w-25 float-start me-2"
+        onChange={(e) => setTodo({ ...todo, id: e.target.value })}
+      />
+      <input
+        type="checkbox"
+        style={{ transform: "scale(2)" }}
+        onChange={(e) =>
+          setTodo({ ...todo, completed: Boolean(e.target.value) })
+        }
+      />
       <hr />
     </div>
   );
