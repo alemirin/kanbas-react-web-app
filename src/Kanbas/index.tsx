@@ -8,12 +8,14 @@ import KanbasNavigation from "./Navigation";
 import Courses from "./Courses";
 import * as userClient from "./Account/client";
 import * as courseClient from "./Courses/client";
+import * as enrollmentsClient from "./Enrollments/client";
 import { useEffect, useState } from "react";
 import ProtectedRoute from "./Account/ProtectedRoute";
 import { useSelector } from "react-redux";
 
 export default function Kanbas() {
   const [courses, setCourses] = useState<any[]>([]);
+  const [enrollments, setEnrollments] = useState<any[]>([]);
 
   const { currentUser } = useSelector((state: any) => state.accountReducer);
 
@@ -26,8 +28,18 @@ export default function Kanbas() {
     }
   };
 
+  const fetchEnrollments = async () => {
+    try {
+      const enrollments = await enrollmentsClient.findAllEnrollments();
+      setEnrollments(enrollments);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     fetchCourses();
+    fetchEnrollments();
   }, [currentUser]);
 
   const [course, setCourse] = useState<any>({
@@ -40,9 +52,12 @@ export default function Kanbas() {
     description: "New Description",
   });
 
-  const addNewCourse = async () => {
-    const newCourse = await userClient.createCourse(course);
-    setCourses([...courses, { ...course, newCourse }]);
+  const addNewCourse = async (uId: string, cId: string) => {
+    const newCourse = userClient.createCourse(course);
+    const newEnrollment = enrollmentsClient.enrollUserInCourse(uId, cId);
+    setCourses([...courses, newCourse]);
+    setEnrollments([...enrollments, newEnrollment]);
+    await fetchCourses();
   };
   const deleteCourse = async (courseId: string) => {
     const status = await courseClient.deleteCourse(courseId);

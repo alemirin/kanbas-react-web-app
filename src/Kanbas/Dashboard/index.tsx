@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import FacultyRoute from "../Account/FacultyRoute";
 import StudentRoute from "../Account/StudentRoute";
 import { RootState } from "../store";
+import * as enrollmentsClient from "../Enrollments/client";
 import { enroll, unenroll, toggleView } from "../Enrollments/reducer";
 
 export default function Dashboard({
@@ -17,11 +18,10 @@ export default function Dashboard({
   courses: any[];
   course: any;
   setCourse: (course: any) => void;
-  addNewCourse: () => void;
+  addNewCourse: (uId: string, cId: string) => void;
   deleteCourse: (courseId: string) => void;
   updateCourse: () => void;
 }) {
-  const navigate = useNavigate();
   const { currentUser } = useSelector(
     (state: RootState) => state.accountReducer
   );
@@ -30,7 +30,7 @@ export default function Dashboard({
   );
   const dispatch = useDispatch();
 
-  const handleEnrollToggle = (
+  const handleEnrollToggle = async (
     e: React.MouseEvent,
     courseId: string,
     isEnrolled: boolean
@@ -41,8 +41,10 @@ export default function Dashboard({
     }
 
     if (isEnrolled) {
+      await enrollmentsClient.unenrollUserFromCourse(currentUser._id, courseId);
       dispatch(unenroll(courseId));
     } else {
+      await enrollmentsClient.enrollUserInCourse(currentUser._id, courseId);
       dispatch(enroll(courseId));
     }
   };
@@ -73,7 +75,12 @@ export default function Dashboard({
           <button
             className="btn btn-primary float-end me-2"
             id="wd-add-new-course-click"
-            onClick={addNewCourse}
+            onClick={(event) => {
+              if (currentUser) {
+                addNewCourse(currentUser._id, course._id);
+                dispatch(enroll(course._id));
+              }
+            }}
           >
             Add
           </button>

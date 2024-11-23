@@ -3,6 +3,8 @@ import AssignmentControlButtons from "./AssignmentControlButtons";
 import SpecificAssignmentButtons from "./SpecificAssignmentControlButtons";
 import DeleteWindow from "./DeleteWindow";
 
+import * as assignmentsClient from "./client";
+
 import {
   MdOutlineAssignment,
   MdExpandMore,
@@ -35,8 +37,8 @@ export default function Assignments() {
   const dispatch = useDispatch();
 
   const { cid } = useParams();
-  const assignments = useSelector(
-    (state: RootState) => state.assignmentReducer.assignments
+  const { assignments } = useSelector(
+    (state: RootState) => state.assignmentReducer
   );
 
   const [isExpanded, setIsExpanded] = useState(true);
@@ -49,9 +51,9 @@ export default function Assignments() {
     setShowDeleteDialog(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (selectedAssignment) {
-      dispatch(deleteAssignment(selectedAssignment._id));
+      await assignmentsClient.deleteAssignment(selectedAssignment._id);
     }
     setShowDeleteDialog(false);
     setSelectedAssignment(null);
