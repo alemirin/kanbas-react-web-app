@@ -13,11 +13,11 @@ import {
 
 import { BsGripVertical } from "react-icons/bs";
 import { useParams, useLocation } from "react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RootState } from "../../store";
 
 import { useSelector, useDispatch } from "react-redux";
-import { deleteAssignment } from "./reducer";
+import { setAssignments, deleteAssignment } from "./reducer";
 import FacultyRoute from "../../Account/FacultyRoute";
 import StudentRoute from "../../Account/StudentRoute";
 
@@ -35,11 +35,21 @@ export default function Assignments() {
   }
 
   const dispatch = useDispatch();
-
   const { cid } = useParams();
+
   const { assignments } = useSelector(
     (state: RootState) => state.assignmentReducer
   );
+
+  const fetchAssignments = async () => {
+    const assignments = await assignmentsClient.fetchAssignmentsForCourse(
+      cid as string
+    );
+    dispatch(setAssignments(assignments));
+  };
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
 
   const [isExpanded, setIsExpanded] = useState(true);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -53,7 +63,11 @@ export default function Assignments() {
 
   const confirmDelete = async () => {
     if (selectedAssignment) {
-      await assignmentsClient.deleteAssignment(selectedAssignment._id);
+      await assignmentsClient.deleteAssignment(
+        cid as string,
+        selectedAssignment._id
+      );
+      dispatch(deleteAssignment(selectedAssignment._id));
     }
     setShowDeleteDialog(false);
     setSelectedAssignment(null);
@@ -86,54 +100,52 @@ export default function Assignments() {
 
           {isExpanded && (
             <ul className="wd-lessons list-group rounded-bottom-4">
-              {assignments
-                .filter((assignment: any) => assignment.course === cid)
-                .map((assignment: any) => (
-                  <li className="wd-lesson list-group-item p-3 ps-1 d-flex gap-4">
+              {assignments.map((assignment: any) => (
+                <li className="wd-lesson list-group-item p-3 ps-1 d-flex gap-4">
+                  <FacultyRoute>
+                    <a
+                      className="wd-assignment-link d-flex align-items-start"
+                      href={`#/Kanbas/Courses/${cid}/Assignments/${assignment._id}/edit`}
+                    >
+                      <BsGripVertical className="me-2 fs-3 align-self-center" />
+                      <MdOutlineAssignment className="fs-1 text text-success align-self-center" />
+                    </a>
+                  </FacultyRoute>
+                  <StudentRoute>
+                    <div className="wd-student-assignment-title d-flex align-items-start">
+                      <BsGripVertical className="me-2 fs-3 align-self-center" />
+                      <MdOutlineAssignment className="fs-1 text text-success align-self-center" />
+                    </div>
+                  </StudentRoute>
+                  <div>
                     <FacultyRoute>
                       <a
-                        className="wd-assignment-link d-flex align-items-start"
+                        className="align-self-start h4 fw-bold mt-3"
                         href={`#/Kanbas/Courses/${cid}/Assignments/${assignment._id}/edit`}
                       >
-                        <BsGripVertical className="me-2 fs-3 align-self-center" />
-                        <MdOutlineAssignment className="fs-1 text text-success align-self-center" />
+                        {assignment.title}
                       </a>
                     </FacultyRoute>
                     <StudentRoute>
-                      <div className="wd-student-assignment-title d-flex align-items-start">
-                        <BsGripVertical className="me-2 fs-3 align-self-center" />
-                        <MdOutlineAssignment className="fs-1 text text-success align-self-center" />
-                      </div>
-                    </StudentRoute>
-                    <div>
-                      <FacultyRoute>
-                        <a
-                          className="align-self-start h4 fw-bold mt-3"
-                          href={`#/Kanbas/Courses/${cid}/Assignments/${assignment._id}/edit`}
-                        >
-                          {assignment.title}
-                        </a>
-                      </FacultyRoute>
-                      <StudentRoute>
-                        <p className="align-self-start h4 fw-bold mt-3">
-                          {assignment.title}
-                        </p>
-                      </StudentRoute>
-                      <p className="mt-3">
-                        <span className="text-danger"> Multiple Modules </span>|{" "}
-                        <b> Not available until</b> {assignment.availUntil} at
-                        12:00 am |<b> Due</b> {assignment.due} at 11:59 pm |{" "}
-                        {assignment.points} pts
+                      <p className="align-self-start h4 fw-bold mt-3">
+                        {assignment.title}
                       </p>
-                    </div>
-                    <FacultyRoute>
-                      <SpecificAssignmentButtons
-                        assignmentId={assignment._id}
-                        deleteAssignment={() => handleDeleteClick(assignment)}
-                      />
-                    </FacultyRoute>
-                  </li>
-                ))}
+                    </StudentRoute>
+                    <p className="mt-3">
+                      <span className="text-danger"> Multiple Modules </span>|{" "}
+                      <b> Not available until</b> {assignment.availUntil} at
+                      12:00 am |<b> Due</b> {assignment.due} at 11:59 pm |{" "}
+                      {assignment.points} pts
+                    </p>
+                  </div>
+                  <FacultyRoute>
+                    <SpecificAssignmentButtons
+                      assignmentId={assignment._id}
+                      deleteAssignment={() => handleDeleteClick(assignment)}
+                    />
+                  </FacultyRoute>
+                </li>
+              ))}
             </ul>
           )}
         </li>

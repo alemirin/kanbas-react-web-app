@@ -8,6 +8,11 @@ export const findAllEnrollments = async () => {
   return response.data;
 };
 
+export const findEnrollmentsForUser = async (uId: string) => {
+  const response = await axios.get(`${REMOTE_SERVER}/api/${uId}/enrollments`);
+  return response.data;
+};
+
 export const enrollUserInCourse = async (userId: string, courseId: string) => {
   const response = await axios.post(`${ENROLLMENTS_API}/${userId}/${courseId}`);
   return response.data;

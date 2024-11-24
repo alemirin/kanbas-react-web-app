@@ -2,16 +2,27 @@ import { useParams, useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { RootState } from "../../store";
-import { addAssignment, updateAssignment } from "./reducer";
+import * as assignmentsClient from "./client";
+import { addAssignment, updateAssignment, setAssignments } from "./reducer";
 
 export default function AssignmentEditor() {
   const { cid, aid } = useParams(); // Get course ID (cid) and assignment ID (aid) from URL
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isNew = !aid;
-  const existingAssignment = useSelector((state: RootState) =>
-    state.assignmentReducer.assignments.find((a) => a._id === aid)
-  );
+
+  const fetchAssignments = async () => {
+    const assignments = await assignmentsClient.fetchAssignmentsForCourse(
+      cid as string
+    );
+    dispatch(setAssignments(assignments));
+  };
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
+
+  const { assignments } = useSelector((state: any) => state.assignmentReducer);
+  const existingAssignment = assignments.find((a: any) => a._id === aid);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -20,6 +31,18 @@ export default function AssignmentEditor() {
   const [group, setGroup] = useState("");
   const [availFrom, setAvailFrom] = useState("");
   const [availUntil, setAvailUntil] = useState("");
+
+  const createAssignmentForCourse = async (assignment: any) => {
+    const newAssignment = await assignmentsClient.createAssignmentForCourse(
+      assignment
+    );
+    dispatch(addAssignment(newAssignment));
+  };
+
+  const updateAssignmentFC = async (assignment: any) => {
+    await assignmentsClient.updateAssignment(assignment);
+    dispatch(updateAssignment(assignment));
+  };
 
   useEffect(() => {
     if (existingAssignment && !isNew) {
@@ -46,9 +69,9 @@ export default function AssignmentEditor() {
       availUntil,
     };
     if (isNew) {
-      dispatch(addAssignment(assignment));
+      createAssignmentForCourse(assignment);
     } else {
-      dispatch(updateAssignment(assignment));
+      updateAssignmentFC(assignment);
     }
     navigate(`/Kanbas/Courses/${cid}/Assignments`);
   };

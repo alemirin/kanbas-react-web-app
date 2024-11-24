@@ -6,13 +6,8 @@ interface Enrollment {
   course: string;
 }
 
-interface EnrollmentState {
-  enrollments: Enrollment[];
-  showAllCourses: boolean;
-}
-
 const initialState = {
-  enrollments: JSON.parse(localStorage.getItem("enrollments") || "{}"), // Stores course enrollment status
+  enrollments: [], // Stores course enrollment status
   showAllCourses: false, // Determines whether to display all courses or only enrolled courses
 };
 
@@ -20,15 +15,29 @@ const enrollmentSlice = createSlice({
   name: "enrollments",
   initialState,
   reducers: {
-    enroll: (state, { payload: courseId }: PayloadAction<string>) => {
-      // Add course to enrollments and persist to localStorage
-      state.enrollments[courseId] = true;
-      localStorage.setItem("enrollments", JSON.stringify(state.enrollments));
+    setEnrollments: (state, action) => {
+      state.enrollments = action.payload;
     },
-    unenroll: (state, { payload: courseId }: PayloadAction<string>) => {
-      // Remove course from enrollments and persist to localStorage
-      delete state.enrollments[courseId];
-      localStorage.setItem("enrollments", JSON.stringify(state.enrollments));
+    enroll: (
+      state,
+      { payload }: PayloadAction<{ userId: string; courseId: string }>
+    ) => {
+      const { userId, courseId } = payload;
+      const newEnrollment: any = {
+        _id: new Date().getTime().toString(),
+        user: userId,
+        course: courseId,
+      };
+      state.enrollments = [...state.enrollments, newEnrollment] as any;
+    },
+    unenroll: (
+      state,
+      { payload }: PayloadAction<{ userId: string; courseId: string }>
+    ) => {
+      const { userId, courseId } = payload;
+      state.enrollments = state.enrollments.filter(
+        (e: any) => e.course !== courseId || e.user !== userId
+      );
     },
     toggleView: (state) => {
       // Toggle between viewing all courses and only enrolled courses
@@ -37,5 +46,6 @@ const enrollmentSlice = createSlice({
   },
 });
 
-export const { enroll, unenroll, toggleView } = enrollmentSlice.actions;
+export const { setEnrollments, enroll, unenroll, toggleView } =
+  enrollmentSlice.actions;
 export default enrollmentSlice.reducer;

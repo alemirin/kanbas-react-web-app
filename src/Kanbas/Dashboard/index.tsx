@@ -1,11 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import FacultyRoute from "../Account/FacultyRoute";
 import StudentRoute from "../Account/StudentRoute";
 import { RootState } from "../store";
 import * as enrollmentsClient from "../Enrollments/client";
-import { enroll, unenroll, toggleView } from "../Enrollments/reducer";
+import {
+  setEnrollments,
+  enroll,
+  unenroll,
+  toggleView,
+} from "../Enrollments/reducer";
 
 export default function Dashboard({
   courses,
@@ -22,13 +27,28 @@ export default function Dashboard({
   deleteCourse: (courseId: string) => void;
   updateCourse: () => void;
 }) {
-  const { currentUser } = useSelector(
-    (state: RootState) => state.accountReducer
-  );
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
   const { enrollments, showAllCourses } = useSelector(
-    (state: RootState) => state.enrollmentsReducer
+    (state: any) => state.enrollmentsReducer
   );
+
   const dispatch = useDispatch();
+
+  const fetchEnrollments = async () => {
+    if (!currentUser) {
+      console.error("No user is currently logged in.");
+      return;
+    }
+    const enrollments = await enrollmentsClient.findEnrollmentsForUser(
+      currentUser._id as string
+    );
+
+    dispatch(setEnrollments(enrollments));
+  };
+
+  useEffect(() => {
+    fetchEnrollments();
+  }, []);
 
   const handleEnrollToggle = async (
     e: React.MouseEvent,
@@ -42,16 +62,22 @@ export default function Dashboard({
 
     if (isEnrolled) {
       await enrollmentsClient.unenrollUserFromCourse(currentUser._id, courseId);
-      dispatch(unenroll(courseId));
+      dispatch(unenroll({ userId: currentUser._id, courseId: courseId }));
     } else {
       await enrollmentsClient.enrollUserInCourse(currentUser._id, courseId);
-      dispatch(enroll(courseId));
+      dispatch(enroll({ userId: currentUser._id, courseId: courseId }));
     }
   };
 
   const displayedCourses = showAllCourses
     ? courses
-    : courses.filter((course) => enrollments[course._id]);
+    : courses.filter((course) =>
+        enrollments.some(
+          (enrollment: any) =>
+            enrollment.user === currentUser._id &&
+            enrollment.course === course._id
+        )
+      );
 
   return (
     <div id="wd-dashboard">
@@ -116,7 +142,11 @@ export default function Dashboard({
       <div id="wd-dashboard-courses" className="row">
         <div className="row row-cols-1 row-cols-md-5 g-4">
           {displayedCourses.map((course) => {
-            const isEnrolled = !!enrollments[course._id];
+            const isEnrolled = enrollments.some(
+              (enrollment: any) =>
+                enrollment.user === currentUser._id &&
+                enrollment.course === course._id
+            );
             return (
               <div
                 key={course._id}
