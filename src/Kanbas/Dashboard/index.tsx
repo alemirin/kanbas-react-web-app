@@ -101,11 +101,12 @@ export default function Dashboard({
           <button
             className="btn btn-primary float-end me-2"
             id="wd-add-new-course-click"
-            onClick={(event) => {
+            onClick={async (event) => {
               if (currentUser) {
-                addNewCourse(currentUser._id, course._id);
+                await addNewCourse(currentUser._id, course._id);
                 dispatch(enroll(course._id));
               }
+              await fetchEnrollments();
             }}
           >
             Add
