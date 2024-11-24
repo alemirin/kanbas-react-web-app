@@ -13,7 +13,7 @@ export default function Lab5() {
     <div>
       <br />
       <h1 className="text-center">Lab 5</h1>
-      <a href={`${REMOTE_SERVER}/lab5`}>
+      <a href={`${REMOTE_SERVER}/lab5/welcome`}>
         <button className="btn btn-outline-primary w-100">Go to Lab 5</button>
       </a>
       <hr />

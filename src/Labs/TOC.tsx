@@ -80,7 +80,7 @@ export default function TOC() {
       <li className="nav-item">
         <a
           id="wd-k"
-          href="https://ales-kanbas-node-server-app-c8feb6cbe599.herokuapp.com/"
+          href="https://ales-kanbas-node-server-app-c8feb6cbe599.herokuapp.com"
           className="nav-link"
         >
           Root Node Server Link
