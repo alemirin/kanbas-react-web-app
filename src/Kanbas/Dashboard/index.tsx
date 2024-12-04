@@ -40,7 +40,7 @@ export default function Dashboard({
       return;
     }
     const enrollments = await enrollmentsClient.findEnrollmentsForUser(
-      currentUser._id as string
+      currentUser.loginId as string
     );
 
     dispatch(setEnrollments(enrollments));
@@ -61,11 +61,14 @@ export default function Dashboard({
     }
 
     if (isEnrolled) {
-      await enrollmentsClient.unenrollUserFromCourse(currentUser._id, courseId);
-      dispatch(unenroll({ userId: currentUser._id, courseId: courseId }));
+      await enrollmentsClient.unenrollUserFromCourse(
+        currentUser.loginId,
+        courseId
+      );
+      dispatch(unenroll({ userId: currentUser.loginId, courseId: courseId }));
     } else {
-      await enrollmentsClient.enrollUserInCourse(currentUser._id, courseId);
-      dispatch(enroll({ userId: currentUser._id, courseId: courseId }));
+      await enrollmentsClient.enrollUserInCourse(currentUser.loginId, courseId);
+      dispatch(enroll({ userId: currentUser.loginId, courseId: courseId }));
     }
   };
 
@@ -74,7 +77,7 @@ export default function Dashboard({
     : courses.filter((course) =>
         enrollments.some(
           (enrollment: any) =>
-            enrollment.user === currentUser._id &&
+            enrollment.user === currentUser.loginId &&
             enrollment.course === course._id
         )
       );
@@ -103,7 +106,7 @@ export default function Dashboard({
             id="wd-add-new-course-click"
             onClick={async (event) => {
               if (currentUser) {
-                await addNewCourse(currentUser._id, course._id);
+                await addNewCourse(currentUser.loginId, course._id);
                 dispatch(enroll(course._id));
               }
               await fetchEnrollments();
@@ -145,7 +148,7 @@ export default function Dashboard({
           {displayedCourses.map((course) => {
             const isEnrolled = enrollments.some(
               (enrollment: any) =>
-                enrollment.user === currentUser._id &&
+                enrollment.user === currentUser.loginId &&
                 enrollment.course === course._id
             );
             return (
