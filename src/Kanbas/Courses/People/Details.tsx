@@ -35,7 +35,7 @@ export default function PeopleDetails() {
   const fetchUser = async () => {
     if (!uid) return;
     const user = await client.findUserById(uid);
-    setUser(user);
+    setUser(user || {});
   };
   useEffect(() => {
     if (uid) fetchUser();
@@ -69,13 +69,13 @@ export default function PeopleDetails() {
         )}
         {!editing && (
           <div className="wd-name" onClick={() => setEditing(true)}>
-            {user.firstName} {user.lastName}
+            {user?.firstName || ""} {user?.lastName || ""}
           </div>
         )}
         {user && editing && (
           <input
             className="form-control w-50 wd-edit-name"
-            defaultValue={`${user.firstName} ${user.lastName}`}
+            defaultValue={`${user.firstName || ""} ${user.lastName || ""}`}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -138,14 +138,14 @@ export default function PeopleDetails() {
         )}
         {!editing && (
           <div className="wd-email" onClick={() => setEditing(true)}>
-            {user.email}
+            {user.email || ""}
           </div>
         )}
         {user && editing && (
           <input
             className="form-control w-50 wd-edit-email"
             type="email"
-            value={user.email}
+            value={user.email || ""}
             onChange={(e) => {
               setUser(() => ({ ...user, email: e.target.value }));
               setEmail(e.target.value);

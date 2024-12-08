@@ -137,6 +137,7 @@ export default function Dashboard({
                             onClick={(e) => {
                               e.preventDefault();
                               updateEnrollment(course._id, !course.enrolled);
+                              fetchEnrollments();
                             }}
                             className={`btn ${
                               course.enrolled ? "btn-danger" : "btn-success"

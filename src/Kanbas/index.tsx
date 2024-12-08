@@ -21,20 +21,25 @@ export default function Kanbas() {
 
   const fetchCourses = async () => {
     try {
-      const allCourses = await courseClient.fetchAllCourses();
-      const enrolledCourses = await enrollmentsClient.findEnrollmentsForUser(
-        currentUser._id
-      );
-      const enrolledCourseIds = new Set(
-        enrolledCourses.map((course: any) => course._id.toString())
-      );
+      if (currentUser.role != "ADMIN") {
+        const allCourses = await courseClient.fetchAllCourses();
+        const enrolledCourses = await enrollmentsClient.findEnrollmentsForUser(
+          currentUser._id
+        );
+        const enrolledCourseIds = new Set(
+          enrolledCourses.map((course: any) => course._id.toString())
+        );
 
-      // Merge enrollment state into all courses
-      const courses = allCourses.map((course: any) => ({
-        ...course,
-        enrolled: enrolledCourseIds.has(course._id.toString()),
-      }));
-      setCourses(courses);
+        // Merge enrollment state into all courses
+        const courses = allCourses.map((course: any) => ({
+          ...course,
+          enrolled: enrolledCourseIds.has(course._id.toString()),
+        }));
+        setCourses(courses);
+      } else {
+        const allCourses = await courseClient.fetchAllCourses();
+        setCourses(allCourses);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -42,10 +47,15 @@ export default function Kanbas() {
 
   const findCoursesForUser = async () => {
     try {
-      const courses = await enrollmentsClient.findEnrollmentsForUser(
-        currentUser._id
-      );
-      setCourses(courses);
+      if (currentUser.role === "ADMIN") {
+        const allCourses = await courseClient.fetchAllCourses();
+        setCourses(allCourses);
+      } else {
+        const courses = await enrollmentsClient.findEnrollmentsForUser(
+          currentUser._id
+        );
+        setCourses(courses);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -57,14 +67,11 @@ export default function Kanbas() {
     } else {
       await userClient.unenrollFromCourse(currentUser._id, courseId);
     }
-    setCourses(
-      courses.map((course) => {
-        if (course._id === courseId) {
-          return { ...course, enrolled: true };
-        } else {
-          return course;
-        }
-      })
+    // Update the local state for the specific course
+    setCourses((prevCourses) =>
+      prevCourses.map((course) =>
+        course._id === courseId ? { ...course, enrolled } : course
+      )
     );
   };
 
