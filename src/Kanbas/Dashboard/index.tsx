@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import FacultyRoute from "../Account/FacultyRoute";
 import StudentRoute from "../Account/StudentRoute";
-import { RootState } from "../store";
 import * as enrollmentsClient from "../Enrollments/client";
 import {
   setEnrollments,
@@ -19,6 +18,9 @@ export default function Dashboard({
   addNewCourse,
   deleteCourse,
   updateCourse,
+  updateEnrollment,
+  enrolling,
+  setEnrolling,
 }: {
   courses: any[];
   course: any;
@@ -26,11 +28,11 @@ export default function Dashboard({
   addNewCourse: (uId: string, cId: string) => void;
   deleteCourse: (courseId: string) => void;
   updateCourse: () => void;
+  updateEnrollment: (courseId: string, enrolled: boolean) => void;
+  enrolling: boolean;
+  setEnrolling: (enrolling: boolean) => void;
 }) {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  const { enrollments, showAllCourses } = useSelector(
-    (state: any) => state.enrollmentsReducer
-  );
 
   const dispatch = useDispatch();
 
@@ -40,7 +42,7 @@ export default function Dashboard({
       return;
     }
     const enrollments = await enrollmentsClient.findEnrollmentsForUser(
-      currentUser.loginId as string
+      currentUser._id as string
     );
 
     dispatch(setEnrollments(enrollments));
@@ -50,38 +52,6 @@ export default function Dashboard({
     fetchEnrollments();
   }, []);
 
-  const handleEnrollToggle = async (
-    e: React.MouseEvent,
-    courseId: string,
-    isEnrolled: boolean
-  ) => {
-    if (!currentUser) {
-      console.error("No user is currently logged in.");
-      return;
-    }
-
-    if (isEnrolled) {
-      await enrollmentsClient.unenrollUserFromCourse(
-        currentUser.loginId,
-        courseId
-      );
-      dispatch(unenroll({ userId: currentUser.loginId, courseId: courseId }));
-    } else {
-      await enrollmentsClient.enrollUserInCourse(currentUser.loginId, courseId);
-      dispatch(enroll({ userId: currentUser.loginId, courseId: courseId }));
-    }
-  };
-
-  const displayedCourses = showAllCourses
-    ? courses
-    : courses.filter((course) =>
-        enrollments.some(
-          (enrollment: any) =>
-            enrollment.user === currentUser.loginId &&
-            enrollment.course === course._id
-        )
-      );
-
   return (
     <div id="wd-dashboard">
       <h1 id="wd-dashboard-title">
@@ -90,9 +60,11 @@ export default function Dashboard({
           <button
             className="btn btn-primary float-end me-2"
             id="wd-enrollments-click"
-            onClick={() => dispatch(toggleView())}
+            onClick={() => {
+              setEnrolling(!enrolling);
+            }}
           >
-            {showAllCourses ? "Show Enrolled Only" : "Show All Courses"}
+            {enrolling ? "Enrolled Only" : "All Courses"}
           </button>
         </StudentRoute>
       </h1>
@@ -106,7 +78,7 @@ export default function Dashboard({
             id="wd-add-new-course-click"
             onClick={async (event) => {
               if (currentUser) {
-                await addNewCourse(currentUser.loginId, course._id);
+                await addNewCourse(currentUser._id, course._id);
                 dispatch(enroll(course._id));
               }
               await fetchEnrollments();
@@ -138,19 +110,12 @@ export default function Dashboard({
       </FacultyRoute>
       <hr />
 
-      <h2 id="wd-dashboard-published">
-        Published Courses ({displayedCourses.length})
-      </h2>
+      <h2 id="wd-dashboard-published">Published Courses ({courses.length})</h2>
       <hr />
 
       <div id="wd-dashboard-courses" className="row">
         <div className="row row-cols-1 row-cols-md-5 g-4">
-          {displayedCourses.map((course) => {
-            const isEnrolled = enrollments.some(
-              (enrollment: any) =>
-                enrollment.user === currentUser.loginId &&
-                enrollment.course === course._id
-            );
+          {courses.map((course) => {
             return (
               <div
                 key={course._id}
@@ -166,6 +131,21 @@ export default function Dashboard({
                   </Link>
                   <div className="card-body">
                     <h5 className="wd-dashboard-course-title card-title">
+                      <StudentRoute>
+                        {enrolling && (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              updateEnrollment(course._id, !course.enrolled);
+                            }}
+                            className={`btn ${
+                              course.enrolled ? "btn-danger" : "btn-success"
+                            } float-end`}
+                          >
+                            {course.enrolled ? "Unenroll" : "Enroll"}
+                          </button>
+                        )}
+                      </StudentRoute>
                       {course.name}
                     </h5>
                     <p
@@ -204,18 +184,6 @@ export default function Dashboard({
                         Edit
                       </button>
                     </FacultyRoute>
-                    <StudentRoute>
-                      <button
-                        onClick={(e) =>
-                          handleEnrollToggle(e, course._id, isEnrolled)
-                        }
-                        className={`btn float-end me-2 ${
-                          isEnrolled ? "btn-danger" : "btn-success"
-                        }`}
-                      >
-                        {isEnrolled ? "Unenroll" : "Enroll"}
-                      </button>
-                    </StudentRoute>
                   </div>
                 </div>
               </div>

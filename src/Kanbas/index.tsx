@@ -15,32 +15,66 @@ import { useSelector } from "react-redux";
 
 export default function Kanbas() {
   const [courses, setCourses] = useState<any[]>([]);
-  const [enrollments, setEnrollments] = useState<any[]>([]);
+  const [enrolling, setEnrolling] = useState<boolean>(false);
 
   const { currentUser } = useSelector((state: any) => state.accountReducer);
 
   const fetchCourses = async () => {
     try {
-      const courses = await userClient.findAllCourses();
+      const allCourses = await courseClient.fetchAllCourses();
+      const enrolledCourses = await enrollmentsClient.findEnrollmentsForUser(
+        currentUser._id
+      );
+      const enrolledCourseIds = new Set(
+        enrolledCourses.map((course: any) => course._id.toString())
+      );
+
+      // Merge enrollment state into all courses
+      const courses = allCourses.map((course: any) => ({
+        ...course,
+        enrolled: enrolledCourseIds.has(course._id.toString()),
+      }));
       setCourses(courses);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const fetchEnrollments = async () => {
+  const findCoursesForUser = async () => {
     try {
-      const enrollments = await enrollmentsClient.findAllEnrollments();
-      setEnrollments(enrollments);
+      const courses = await enrollmentsClient.findEnrollmentsForUser(
+        currentUser._id
+      );
+      setCourses(courses);
     } catch (error) {
       console.error(error);
     }
   };
 
+  const updateEnrollment = async (courseId: string, enrolled: boolean) => {
+    if (enrolled) {
+      await userClient.enrollIntoCourse(currentUser._id, courseId);
+    } else {
+      await userClient.unenrollFromCourse(currentUser._id, courseId);
+    }
+    setCourses(
+      courses.map((course) => {
+        if (course._id === courseId) {
+          return { ...course, enrolled: true };
+        } else {
+          return course;
+        }
+      })
+    );
+  };
+
   useEffect(() => {
-    fetchCourses();
-    fetchEnrollments();
-  }, [currentUser]);
+    if (enrolling) {
+      fetchCourses();
+    } else {
+      findCoursesForUser();
+    }
+  }, [currentUser, enrolling]);
 
   const [course, setCourse] = useState<any>({
     _id: "RS500",
@@ -64,10 +98,9 @@ export default function Kanbas() {
       ...course,
       _id: newId,
     };
-    await userClient.createCourse(newCourse);
-    const newEnrollment = enrollmentsClient.enrollUserInCourse(uId, cId);
-    setCourses([...courses, newCourse]);
-    setEnrollments([...enrollments, newEnrollment]);
+    const newCourseObj = await courseClient.createCourse(newCourse);
+    const newEnrollment = userClient.enrollIntoCourse(uId, cId);
+    setCourses([...courses, newCourseObj]);
     await fetchCourses();
   };
   const deleteCourse = async (courseId: string) => {
@@ -106,6 +139,9 @@ export default function Kanbas() {
                     addNewCourse={addNewCourse}
                     deleteCourse={deleteCourse}
                     updateCourse={updateCourse}
+                    enrolling={enrolling}
+                    setEnrolling={setEnrolling}
+                    updateEnrollment={updateEnrollment}
                   />
                 </ProtectedRoute>
               }
