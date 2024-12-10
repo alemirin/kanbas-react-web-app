@@ -1,11 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface Enrollment {
-  _id: string;
-  user: string;
-  course: string;
-}
-
 const initialState = {
   enrollments: [], // Stores course enrollment status
   showAllCourses: false, // Determines whether to display all courses or only enrolled courses

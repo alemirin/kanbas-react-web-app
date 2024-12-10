@@ -46,7 +46,7 @@ export default function Quizzes() {
 
   const confirmDelete = async () => {
     if (selectedQuiz) {
-      await quizClient.deleteQuiz(cid as string, selectedQuiz._id);
+      await quizClient.deleteQuiz(selectedQuiz._id);
       dispatch(deleteQuiz(selectedQuiz._id));
     }
     setShowDeleteDialog(false);

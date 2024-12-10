@@ -84,7 +84,6 @@ export default function Kanbas() {
   }, [currentUser, enrolling]);
 
   const [course, setCourse] = useState<any>({
-    _id: "RS500",
     name: "New Course",
     number: "New Number",
     startDate: "2023-09-10",
@@ -94,21 +93,10 @@ export default function Kanbas() {
   });
 
   const addNewCourse = async (uId: string, cId: string) => {
-    // Generate a new unique ID based on the last course's ID
-    const lastCourse = courses[courses.length - 1];
-    const newId = lastCourse
-      ? `RS${parseInt(lastCourse._id.slice(2)) + 1}`
-      : "RS501"; // Start with RS101 if no courses exist
-
-    // Create a new course with the generated ID
-    const newCourse = {
-      ...course,
-      _id: newId,
-    };
-    const newCourseObj = await courseClient.createCourse(newCourse);
-    const newEnrollment = userClient.enrollIntoCourse(uId, cId);
+    const newCourseObj = await courseClient.createCourse(course);
+    const status = await userClient.enrollIntoCourse(uId, cId);
     setCourses([...courses, newCourseObj]);
-    await fetchCourses();
+    await findCoursesForUser();
   };
   const deleteCourse = async (courseId: string) => {
     const status = await courseClient.deleteCourse(courseId);

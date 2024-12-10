@@ -115,81 +115,82 @@ export default function Dashboard({
 
       <div id="wd-dashboard-courses" className="row">
         <div className="row row-cols-1 row-cols-md-5 g-4">
-          {courses.map((course) => {
-            return (
-              <div
-                key={course._id}
-                className="wd-dashboard-course col"
-                style={{ width: "300px" }}
-              >
-                <div className="card rounded-3 overflow-hidden">
-                  <Link
-                    to={`#/Kanbas/Courses/${course._id}/Home`}
-                    className="wd-dashboard-course-link text-decoration-none text-dark"
-                  >
-                    <img src={course.image} width="100%" height={160} />
-                  </Link>
-                  <div className="card-body">
-                    <h5 className="wd-dashboard-course-title card-title">
-                      <StudentRoute>
-                        {enrolling && (
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              updateEnrollment(course._id, !course.enrolled);
-                              fetchEnrollments();
-                            }}
-                            className={`btn ${
-                              course.enrolled ? "btn-danger" : "btn-success"
-                            } float-end`}
-                          >
-                            {course.enrolled ? "Unenroll" : "Enroll"}
-                          </button>
-                        )}
-                      </StudentRoute>
-                      {course.name}
-                    </h5>
-                    <p
-                      className="wd-dashboard-course-title card-text overflow-y-hidden"
-                      style={{ maxHeight: 100 }}
+          {courses.length > 0 &&
+            courses.map((course) => {
+              return (
+                <div
+                  key={course._id}
+                  className="wd-dashboard-course col"
+                  style={{ width: "300px" }}
+                >
+                  <div className="card rounded-3 overflow-hidden">
+                    <Link
+                      to={`#/Kanbas/Courses/${course._id}/Home`}
+                      className="wd-dashboard-course-link text-decoration-none text-dark"
                     >
-                      {course.description}
-                    </p>
-                    <a
-                      href={`#/Kanbas/Courses/${course._id}/Home`}
-                      className="btn btn-primary"
-                    >
-                      Go
-                    </a>
-                    <FacultyRoute>
-                      <button
-                        onClick={(event) => {
-                          event.preventDefault();
-                          deleteCourse(course._id);
-                        }}
-                        className="btn btn-danger float-end"
-                        id="wd-delete-course-click"
+                      <img src={course.image} width="100%" height={160} />
+                    </Link>
+                    <div className="card-body">
+                      <h5 className="wd-dashboard-course-title card-title">
+                        <StudentRoute>
+                          {enrolling && (
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                updateEnrollment(course._id, !course.enrolled);
+                                fetchEnrollments();
+                              }}
+                              className={`btn ${
+                                course.enrolled ? "btn-danger" : "btn-success"
+                              } float-end`}
+                            >
+                              {course.enrolled ? "Unenroll" : "Enroll"}
+                            </button>
+                          )}
+                        </StudentRoute>
+                        {course.name}
+                      </h5>
+                      <p
+                        className="wd-dashboard-course-title card-text overflow-y-hidden"
+                        style={{ maxHeight: 100 }}
                       >
-                        Delete
-                      </button>
-                    </FacultyRoute>
-                    <FacultyRoute>
-                      <button
-                        id="wd-edit-course-click"
-                        onClick={(event) => {
-                          event.preventDefault();
-                          setCourse(course);
-                        }}
-                        className="btn btn-warning float-end me-2"
+                        {course.description}
+                      </p>
+                      <a
+                        href={`#/Kanbas/Courses/${course._id}/Home`}
+                        className="btn btn-primary"
                       >
-                        Edit
-                      </button>
-                    </FacultyRoute>
+                        Go
+                      </a>
+                      <FacultyRoute>
+                        <button
+                          onClick={(event) => {
+                            event.preventDefault();
+                            deleteCourse(course._id);
+                          }}
+                          className="btn btn-danger float-end"
+                          id="wd-delete-course-click"
+                        >
+                          Delete
+                        </button>
+                      </FacultyRoute>
+                      <FacultyRoute>
+                        <button
+                          id="wd-edit-course-click"
+                          onClick={(event) => {
+                            event.preventDefault();
+                            setCourse(course);
+                          }}
+                          className="btn btn-warning float-end me-2"
+                        >
+                          Edit
+                        </button>
+                      </FacultyRoute>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
       </div>
     </div>
