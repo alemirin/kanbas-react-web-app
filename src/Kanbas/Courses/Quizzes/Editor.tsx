@@ -6,7 +6,7 @@ import * as quizClient from "./client";
 import { addQuiz, updateQuiz, setQuizzes } from "./reducer";
 
 export default function QuizEditor() {
-  const { cid, qid } = useParams(); // Get course ID (cid) and assignment ID (aid) from URL
+  const { cid, qid } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isNew = !qid;
@@ -25,8 +25,19 @@ export default function QuizEditor() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [points, setPoints] = useState(0);
+  const [quizType, setQuizType] = useState("GRADED");
+  const [group, setGroup] = useState("QUIZZES");
+  const [shuffle, setShuffle] = useState(true);
+  const [isTimed, setIsTimed] = useState(true);
+  const [time, setTime] = useState(20);
+  const [hasMultipleAttempts, setHasMultipleAttempts] = useState(false);
+  const [showCorrect, setShowCorrect] = useState(true);
+  const [needsCode, setNeedsCode] = useState(false);
+  const [accessCode, setAccessCode] = useState("");
+  const [oneAtATime, setOneAtATime] = useState(true);
+  const [webcamRequired, setWebcamRequired] = useState(false);
+  const [lockQuestions, setLockQuestions] = useState(false);
   const [due, setDue] = useState("");
-  const [group, setGroup] = useState("");
   const [availFrom, setAvailFrom] = useState("");
   const [availUntil, setAvailUntil] = useState("");
 
@@ -44,26 +55,50 @@ export default function QuizEditor() {
     if (existingQuiz && !isNew) {
       setTitle(existingQuiz.title);
       setDescription(existingQuiz.description);
-      setPoints(parseInt(existingQuiz.points));
+      setPoints(existingQuiz.points);
+      setQuizType(existingQuiz.quiztype);
+      setGroup(existingQuiz.group);
+      setShuffle(existingQuiz.shuffle);
+      setIsTimed(existingQuiz.isTimed);
+      setTime(existingQuiz.time);
+      setHasMultipleAttempts(existingQuiz.hasMultipleAttempts);
+      setShowCorrect(existingQuiz.showCorrect);
+      setNeedsCode(existingQuiz.needsCode);
+      setAccessCode(existingQuiz.accessCode);
+      setOneAtATime(existingQuiz.oneAtATime);
+      setWebcamRequired(existingQuiz.webcamRequired);
+      setLockQuestions(existingQuiz.lockQuestions);
       setDue(existingQuiz.due);
       setAvailFrom(existingQuiz.availFrom);
-      setGroup(existingQuiz.group);
       setAvailUntil(existingQuiz.availUntil);
     }
   }, [existingQuiz, isNew]);
 
-  const handleSave = () => {
+  const handleSave = (publish: boolean = false) => {
     const quiz = {
       _id: isNew ? new Date().getTime().toString() : qid,
       course: cid,
       title,
       description,
       points,
+      quiztype: quizType,
       group,
+      shuffle,
+      isTimed,
+      time,
+      hasMultipleAttempts,
+      showCorrect,
+      needsCode,
+      accessCode,
+      oneAtATime,
+      webcamRequired,
+      lockQuestions,
       due,
-      avail: availFrom,
+      availFrom,
       availUntil,
+      quizStatus: publish ? "AVAILABLE" : "NOT AVAILABLE",
     };
+
     if (isNew) {
       createQuizForCourse(quiz);
     } else {
@@ -91,12 +126,10 @@ export default function QuizEditor() {
           type="text"
         />
       </div>
-      <br />
-      <br />
+
       <div className="mb-3">
         <label htmlFor="wd-description" className="form-label">
-          {" "}
-          Description{" "}
+          Description
         </label>
         <textarea
           cols={30}
@@ -108,8 +141,28 @@ export default function QuizEditor() {
           placeholder="Description"
         />
       </div>
-      <br />
-      <br />
+
+      <div className="row mb-3">
+        <div className="col-auto">
+          <label htmlFor="quiz-type" className="form-label">
+            Quiz Type
+          </label>
+        </div>
+        <div className="col">
+          <select
+            id="quiz-type"
+            className="form-select"
+            value={quizType}
+            onChange={(e) => setQuizType(e.target.value)}
+          >
+            <option value="GRADED">Graded Quiz</option>
+            <option value="PRACTICE">Practice Quiz</option>
+            <option value="GRADED SURVEY">Graded Survey</option>
+            <option value="UNGRADED SURVEY">Ungraded Survey</option>
+          </select>
+        </div>
+      </div>
+
       <div className="row mb-3">
         <div className="col-auto">
           <label htmlFor="wd-points" className="form-label">
@@ -127,131 +180,165 @@ export default function QuizEditor() {
           />
         </div>
       </div>
+
       <div className="row mb-3">
         <div className="col-auto">
           <label htmlFor="wd-assignment-group" className="form-label">
-            Quiz Group
+            Assignment Group
           </label>
         </div>
         <div className="col">
           <select
             id="wd-select-assignment-group"
-            className="form-select col"
+            className="form-select"
             value={group}
+            onChange={(e) => setGroup(e.target.value)}
           >
-            <option value="ASSIGNMENTS">ASSIGNMENTS</option>
-            <option value="QUIZZES">QUIZZES</option>
-            <option value="EXAMS">EXAMS</option>
+            <option value="QUIZZES">Quizzes</option>
+            <option value="EXAMS">Exams</option>
+            <option value="ASSIGNMENTS">Assignments</option>
+            <option value="PROJECTS">Projects</option>
           </select>
         </div>
       </div>
+
       <div className="row mb-3">
         <div className="col-auto">
-          <label htmlFor="wd-display-grade" className="form-label">
-            Display Grade as
-          </label>
+          <label className="form-label">Options</label>
         </div>
         <div className="col">
-          <select id="wd-select-display-grade" className="form-select">
-            <option value="Percentage">Percentage</option>
-            <option value="Fraction">Fraction</option>
-          </select>
-        </div>
+          <div className="border p-3 rounded">
+            <div className="form-check mb-2">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="shuffle-answers"
+                checked={shuffle}
+                onChange={(e) => setShuffle(e.target.checked)}
+              />
+              <label className="form-check-label" htmlFor="shuffle-answers">
+                Shuffle Answers
+              </label>
+            </div>
 
-        <br />
-        <br />
+            <div className="form-check mb-2">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="time-limit"
+                checked={isTimed}
+                onChange={(e) => setIsTimed(e.target.checked)}
+              />
+              <label className="form-check-label" htmlFor="time-limit">
+                Time Limit
+              </label>
+              {isTimed && (
+                <input
+                  type="number"
+                  className="form-control mt-2"
+                  value={time}
+                  onChange={(e) => setTime(parseInt(e.target.value))}
+                  placeholder="Minutes"
+                />
+              )}
+            </div>
 
-        <div className="row mb-3">
-          <div className="col-auto">
-            <label htmlFor="wd-submission-type" className="form-label">
-              Submission Type
-            </label>
-          </div>
-          <div className="col">
-            <select id="wd-select-submission-type" className="form-select">
-              <option value="Online">Online</option>
-              <option value="In person">In-person</option>
-              <option value="Carrier pigeon">Carrier Pigeon</option>
-            </select>
+            <div className="form-check mb-2">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="multiple-attempts"
+                checked={hasMultipleAttempts}
+                onChange={(e) => setHasMultipleAttempts(e.target.checked)}
+              />
+              <label className="form-check-label" htmlFor="multiple-attempts">
+                Allow Multiple Attempts
+              </label>
+            </div>
+
+            <div className="form-check mb-2">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="show-correct"
+                checked={showCorrect}
+                onChange={(e) => setShowCorrect(e.target.checked)}
+              />
+              <label className="form-check-label" htmlFor="show-correct">
+                Show Correct Answers
+              </label>
+            </div>
+
+            <div className="form-check mb-2">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="needs-code"
+                checked={needsCode}
+                onChange={(e) => setNeedsCode(e.target.checked)}
+              />
+              <label className="form-check-label" htmlFor="needs-code">
+                Require Access Code
+              </label>
+              {needsCode && (
+                <input
+                  type="text"
+                  className="form-control mt-2"
+                  value={accessCode}
+                  onChange={(e) => setAccessCode(e.target.value)}
+                  placeholder="Access Code"
+                />
+              )}
+            </div>
+
+            <div className="form-check mb-2">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="one-at-time"
+                checked={oneAtATime}
+                onChange={(e) => setOneAtATime(e.target.checked)}
+              />
+              <label className="form-check-label" htmlFor="one-at-time">
+                One Question at a Time
+              </label>
+            </div>
+
+            <div className="form-check mb-2">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="webcam"
+                checked={webcamRequired}
+                onChange={(e) => setWebcamRequired(e.target.checked)}
+              />
+              <label className="form-check-label" htmlFor="webcam">
+                Require Webcam
+              </label>
+            </div>
+
+            <div className="form-check mb-2">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="lock-questions"
+                checked={lockQuestions}
+                onChange={(e) => setLockQuestions(e.target.checked)}
+              />
+              <label className="form-check-label" htmlFor="lock-questions">
+                Lock Questions After Answering
+              </label>
+            </div>
           </div>
         </div>
       </div>
-      <div className="row mb-3">
-        <div className="col-auto">
-          <label htmlFor="wd-online-entry-options" className="form-label">
-            Online Entry Options
-          </label>
-        </div>
-        <div className="col">
-          <div className="form-check">
-            <input
-              type="checkbox"
-              name="text-entry"
-              id="wd-text-entry"
-              className="form-check-input"
-            />
-            <label htmlFor="wd-text-entry" className="form-check-label">
-              Text Entry
-            </label>
-          </div>
-          <div className="form-check">
-            <input
-              type="checkbox"
-              name="website-url"
-              id="wd-web-url"
-              className="form-check-input"
-            />
-            <label htmlFor="wd-web-url-entry" className="form-check-label">
-              Website URL
-            </label>
-          </div>
-          <div className="form-check">
-            <input
-              type="checkbox"
-              name="media-recordings"
-              id="wd-media-recordings"
-              className="form-check-input"
-            />
-
-            <label htmlFor="wd-media-recordings" className="form-check-label">
-              Media Recordings
-            </label>
-          </div>
-          <div className="form-check">
-            <input
-              type="checkbox"
-              name="student-annotation"
-              id="wd-student-annotation"
-              className="form-check-input"
-            />
-            <label htmlFor="wd-student-annotation" className="form-check-label">
-              Student Annotation
-            </label>
-          </div>
-          <div className="form-check">
-            <input
-              type="checkbox"
-              name="file-uploads"
-              id="wd-file-uploads"
-              className="form-check-input"
-            />
-            <label htmlFor="wd-file-uploads" className="form-check-label">
-              File Uploads
-            </label>
-          </div>
-        </div>
-      </div>
 
       <div className="row mb-3">
-        {/* Wrapper for the whole section */}
         <div className="col-auto">
           <label className="form-label">Assign</label>
         </div>
         <div className="col">
           <div className="border p-3 rounded">
-            {" "}
-            {/* Add a border around the whole form group */}
-            {/* First Row - Assign to and Due */}
             <div className="row mb-3">
               <div className="col-md-12">
                 <label htmlFor="wd-assign-to" className="form-label">
@@ -265,7 +352,7 @@ export default function QuizEditor() {
                 />
               </div>
             </div>
-            {/* Second Row - Due */}
+
             <div className="row mb-3">
               <div className="col-md-12">
                 <label htmlFor="wd-due" className="form-label">
@@ -281,7 +368,7 @@ export default function QuizEditor() {
                 />
               </div>
             </div>
-            {/* Third Row - Available from and Until */}
+
             <div className="row mb-3">
               <div className="col-md-6">
                 <label htmlFor="wd-available-from" className="form-label">
@@ -331,11 +418,18 @@ export default function QuizEditor() {
           Cancel
         </button>
         <button
-          onClick={handleSave}
+          onClick={() => handleSave(false)}
           id="wd-save-edit-assignment"
-          className="btn btn-primary"
+          className="btn btn-danger me-2"
         >
           Save
+        </button>
+        <button
+          onClick={() => handleSave(true)}
+          id="wd-save-and-publish"
+          className="btn btn-primary"
+        >
+          Save & Publish
         </button>
       </div>
     </div>
