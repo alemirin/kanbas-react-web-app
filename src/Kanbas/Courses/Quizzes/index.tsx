@@ -56,6 +56,16 @@ export default function Quizzes() {
     setShowDeleteDialog(true);
   };
 
+  const handlePublishClick = async (quiz: any) => {
+    try {
+      const updatedQuiz = { ...quiz, isPublished: !quiz.isPublished }; // Toggle the isPublished field
+      await quizClient.updateQuiz(updatedQuiz); // Send the update to the backend
+      fetchQuizzes(); // Update the Redux state
+    } catch (error) {
+      console.error("Failed to update quiz publish state:", error);
+    }
+  };
+
   const confirmDelete = async () => {
     if (selectedQuiz) {
       await quizClient.deleteQuiz(selectedQuiz._id);
@@ -136,8 +146,10 @@ export default function Quizzes() {
                   </div>
                   <FacultyRoute>
                     <SpecificQuizControlButtons
+                      quiz={quiz}
                       quizId={quiz._id}
                       deleteQuiz={() => handleDeleteClick(quiz)}
+                      handlePublishClick={() => handlePublishClick(quiz)}
                     />
                   </FacultyRoute>
                 </li>

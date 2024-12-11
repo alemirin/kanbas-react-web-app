@@ -5,11 +5,15 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
 export default function SpecificQuizControlButtons({
+  quiz,
   quizId,
   deleteQuiz,
+  handlePublishClick,
 }: {
+  quiz: any;
   quizId: string;
   deleteQuiz: () => void;
+  handlePublishClick: () => void;
 }) {
   const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate();
@@ -46,6 +50,15 @@ export default function SpecificQuizControlButtons({
             }}
           >
             Delete
+          </button>
+          <button
+            className="dropdown-item text-start text-danger"
+            onClick={() => {
+              handlePublishClick();
+              setShowMenu(false);
+            }}
+          >
+            {quiz.isPublished ? "Unpublish" : "Publish"}
           </button>
         </div>
       )}
