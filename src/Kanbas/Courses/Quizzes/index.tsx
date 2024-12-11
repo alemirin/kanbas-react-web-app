@@ -15,6 +15,7 @@ import { BsGripVertical } from "react-icons/bs";
 import { useParams, useLocation } from "react-router";
 import { useState, useEffect } from "react";
 import { RootState } from "../../store";
+import { Link } from "react-router-dom";
 
 import { useSelector, useDispatch } from "react-redux";
 import { setQuizzes, deleteQuiz } from "./reducer";
@@ -99,17 +100,20 @@ export default function Quizzes() {
                   </StudentRoute>
                   <div>
                     <FacultyRoute>
-                      <a
-                        className="align-self-start h4 fw-bold mt-3"
-                        href={`#/Kanbas/Courses/${cid}/Quizzes/${quiz._id}/edit`}
+                      <Link
+                        to={`/Kanbas/Courses/${cid}/Quizzes/${quiz._id}`}
+                        className="align-self-start h4 fw-bold mt-3 text-decoration-none"
                       >
                         {quiz.title}
-                      </a>
+                      </Link>
                     </FacultyRoute>
                     <StudentRoute>
-                      <p className="align-self-start h4 fw-bold mt-3">
+                      <Link
+                        to={`/Kanbas/Courses/${cid}/Quizzes/${quiz._id}`}
+                        className="align-self-start h4 fw-bold mt-3 text-decoration-none"
+                      >
                         {quiz.title}
-                      </p>
+                      </Link>
                     </StudentRoute>
                     <p className="mt-3">
                       <span className="text-danger"> {quiz.quizStatus} </span>{" "}
