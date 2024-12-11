@@ -17,7 +17,7 @@ import { useState, useEffect } from "react";
 import { RootState } from "../../store";
 
 import { useSelector, useDispatch } from "react-redux";
-import { setQuizzes, deleteQuiz } from "./reducer";
+import { setQuizzes, deleteQuiz, editQuiz } from "./reducer";
 import FacultyRoute from "../../Account/FacultyRoute";
 import StudentRoute from "../../Account/StudentRoute";
 
