@@ -18,7 +18,7 @@ import { RootState } from "../../store";
 import { Link } from "react-router-dom";
 
 import { useSelector, useDispatch } from "react-redux";
-import { setQuizzes, deleteQuiz } from "./reducer";
+import { setQuizzes, deleteQuiz, editQuiz } from "./reducer";
 import FacultyRoute from "../../Account/FacultyRoute";
 import StudentRoute from "../../Account/StudentRoute";
 
@@ -55,6 +55,16 @@ export default function Quizzes() {
   const handleDeleteClick = (quiz: any) => {
     setSelectedQuiz(quiz);
     setShowDeleteDialog(true);
+  };
+
+  const handlePublishClick = async (quiz: any) => {
+    try {
+      const updatedQuiz = { ...quiz, isPublished: !quiz.isPublished }; // Toggle the isPublished field
+      await quizClient.updateQuiz(updatedQuiz); // Send the update to the backend
+      fetchQuizzes(); // Update the Redux state
+    } catch (error) {
+      console.error("Failed to update quiz publish state:", error);
+    }
   };
 
   const confirmDelete = async () => {
@@ -140,8 +150,10 @@ export default function Quizzes() {
                   </div>
                   <FacultyRoute>
                     <SpecificQuizControlButtons
+                      quiz={quiz}
                       quizId={quiz._id}
                       deleteQuiz={() => handleDeleteClick(quiz)}
+                      handlePublishClick={() => handlePublishClick(quiz)}
                     />
                   </FacultyRoute>
                 </li>
