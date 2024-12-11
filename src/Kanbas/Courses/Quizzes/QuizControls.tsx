@@ -2,7 +2,11 @@ import { FaPlus } from "react-icons/fa6";
 import FacultyRoute from "../../Account/FacultyRoute";
 import { useNavigate, useParams } from "react-router";
 
-export default function QuizControls() {
+export default function QuizControls({
+  filterQuizzes,
+}: {
+  filterQuizzes: (title: string) => void;
+}) {
   const { cid } = useParams();
   const navigate = useNavigate();
   return (
@@ -28,6 +32,7 @@ export default function QuizControls() {
         className="search-input rounded"
         type="search"
         placeholder="&#128270; Search..."
+        onChange={(e) => filterQuizzes(e.target.value)}
       />
     </div>
   );

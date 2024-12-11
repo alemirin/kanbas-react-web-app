@@ -26,7 +26,19 @@ export default function Quizzes() {
   const dispatch = useDispatch();
   const { cid } = useParams();
 
-  const { quizzes } = useSelector((state: RootState) => state.quizReducer);
+  const { quizzes } = useSelector((state: any) => state.quizReducer);
+
+  const [title, setTitle] = useState("");
+
+  const filterQuizzesByTitle = async (title: string) => {
+    setTitle(title);
+    if (title) {
+      const quizzes = await quizClient.findQuizzesByTitle(title, cid as string);
+      dispatch(setQuizzes(quizzes));
+    } else {
+      fetchQuizzes();
+    }
+  };
 
   const fetchQuizzes = async () => {
     const quizzes = await quizClient.fetchQuizzesForCourse(cid as string);
@@ -56,7 +68,7 @@ export default function Quizzes() {
 
   return (
     <div id="wd-assignments" className="list-group rounded-0">
-      <QuizControls />
+      <QuizControls filterQuizzes={filterQuizzesByTitle} />
       <br />
       <br />
       <br />
