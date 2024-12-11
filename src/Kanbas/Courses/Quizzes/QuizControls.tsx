@@ -19,17 +19,17 @@ export default function QuizControls({
         <FacultyRoute>
           <button
             id="wd-quiz-controls-btn"
-            className="btn btn-lg me-1 float-end"
+            className="btn btn-lg me-1 float-end hoverable-icon"
             style={{
               border: "1px solid black",
               backgroundColor: "#ccc",
             }}
           >
-            <IoEllipsisVertical className="fs-4 hoverable-icon" />
+            <IoEllipsisVertical className="fs-4" />
           </button>
           <button
             id="wd-add-assignment-btn"
-            className="btn btn-lg btn-danger me-1 float-end"
+            className="btn btn-lg btn-danger me-1 float-end hoverable-icon"
             onClick={() => navigate(`/Kanbas/Courses/${cid}/Quizzes/new`)}
           >
             <FaPlus
