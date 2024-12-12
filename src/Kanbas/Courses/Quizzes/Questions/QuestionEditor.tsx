@@ -1,6 +1,7 @@
 import EditorNavigation from "../EditorNavigation";
 import { useParams, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
+import { FaTrash } from "react-icons/fa";
 import * as questionClient from "./client";
 
 export default function QuestionEditor() {
@@ -102,18 +103,21 @@ export default function QuestionEditor() {
       </div>
       <EditorNavigation />
       <div className="d-flex justify-content-center">
-        <div className="list-group">
+        <div className="list-group list-group-flush">
           {draftQuestions.map((question: any, index: number) => (
             <div key={question._id} className="list-group-item">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
                   <h5>{question.title || `Question ${index + 1}`}</h5>
-                  <p>Type: {question.questiontype}</p>
+                  <p>
+                    Type:
+                    {question.questiontype}
+                  </p>
                   <p>Points: {question.points}</p>
                 </div>
                 <div>
                   <button
-                    className="btn btn-sm btn-warning me-2"
+                    className="btn btn-sm btn-secondary me-2 ms-5"
                     onClick={() =>
                       handleQuestionChange(index, {
                         ...question,
@@ -127,7 +131,7 @@ export default function QuestionEditor() {
                     className="btn btn-sm btn-danger"
                     onClick={() => handleQuestionDelete(index)}
                   >
-                    Delete
+                    <FaTrash />
                   </button>
                 </div>
               </div>
