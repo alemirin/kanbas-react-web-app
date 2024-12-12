@@ -1,8 +1,10 @@
 import EditorNavigation from "../EditorNavigation";
 import { useParams, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
 import * as questionClient from "./client";
+import * as quizClient from "../client";
 
 export default function QuestionEditor() {
   const { cid, qid } = useParams();
@@ -10,6 +12,9 @@ export default function QuestionEditor() {
   const [draftQuestions, setDraftQuestions] = useState<any>([]);
   const [totalPoints, setTotalPoints] = useState(0);
   const navigate = useNavigate();
+  const [quizId, setQuizId] = useState(qid);
+  const [showPopup, setShowPopup] = useState(false);
+  const location = useLocation();
 
   // Fetch questions for the quiz on component mount
   useEffect(() => {
@@ -24,12 +29,15 @@ export default function QuestionEditor() {
       }
     };
     fetchQuestions();
-  }, [qid]);
+    if (qid === "undefined") {
+      setShowPopup(true);
+    }
+  }, [qid, location]);
 
   const addNewQuestion = async () => {
     const newQuestion = {
       title: "",
-      questionType: "MULTIPLECHOICE",
+      questiontype: "MULTIPLECHOICE",
       question: "",
       points: 0,
       choices: [],
@@ -96,8 +104,29 @@ export default function QuestionEditor() {
     }
   };
 
+  const handleClosePopup = () => {
+    setShowPopup(false);
+  };
+
   return (
     <div id="wd-questions-editor" className="container mt-4">
+      {showPopup && (
+        <div className="card">
+          <div className="card-body">
+            <div className="d-flex justify-content-center">
+              <p>
+                Please navigate to the details screen and create the quiz before
+                creating questions!
+              </p>
+            </div>
+            <div className="d-flex justify-content-center">
+              <button className="btn btn-secondary" onClick={handleClosePopup}>
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="d-flex justify-content-end">
         <h4>Total Points: {totalPoints}</h4>
       </div>
@@ -111,7 +140,8 @@ export default function QuestionEditor() {
                   <h5>{question.title || `Question ${index + 1}`}</h5>
                   <p>
                     Type:
-                    {question.questiontype}
+                    {question.questiontype.charAt(0).toUpperCase() +
+                      question.questiontype.slice(1).toLowerCase()}
                   </p>
                   <p>Points: {question.points}</p>
                 </div>
@@ -150,7 +180,12 @@ export default function QuestionEditor() {
         <button className="btn btn-secondary me-2" onClick={handleCancel}>
           Cancel
         </button>
-        <button className="btn btn-danger" onClick={handleSave}>
+        <button
+          className="btn btn-danger"
+          onClick={() => {
+            handleSave();
+          }}
+        >
           Save
         </button>
       </div>
