@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import EditorNavigation from "../EditorNavigation";
 import { useParams, useNavigate } from "react-router";
 
@@ -7,7 +6,6 @@ import { useLocation } from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
 import * as questionClient from "./client";
 import * as quizClient from "../client";
-
 
 import MultipleChoiceEditor from "./MultipleChoiceEditor";
 import TrueFalseEditor from "./TrueFalseEditor";
@@ -25,28 +23,13 @@ export default function QuestionEditor() {
   const [draftQuestions, setDraftQuestions] = useState<any[]>([]);
   const [totalPoints, setTotalPoints] = useState(0);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [selectedQuestionType, setSelectedQuestionType] = useState<string>("MULTIPLECHOICE");
+  const [selectedQuestionType, setSelectedQuestionType] =
+    useState<string>("MULTIPLECHOICE");
 
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         const data = await questionClient.fetchQuestionsForQuiz(qid!);
-
-export default function QuestionEditor() {
-  const { cid, qid } = useParams();
-  const [questions, setQuestions] = useState<any>([]);
-  const [draftQuestions, setDraftQuestions] = useState<any>([]);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const navigate = useNavigate();
-  const [quizId, setQuizId] = useState(qid);
-  const [showPopup, setShowPopup] = useState(false);
-  const location = useLocation();
-
-  // Fetch questions for the quiz on component mount
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        const data = await questionClient.fetchQuestionsForQuiz(qid! as string);
         setQuestions(data);
         setDraftQuestions(data);
         calculateTotalPoints(data);
@@ -61,7 +44,6 @@ export default function QuestionEditor() {
     }
   }, [qid, location]);
 
-
   const calculateTotalPoints = (qs: any[]) => {
     const points = qs.reduce((sum, q) => sum + (q.points || 0), 0);
     setTotalPoints(points);
@@ -74,7 +56,7 @@ export default function QuestionEditor() {
       question: "",
       points: 0,
       choices: [],
-      possibleAnswers: []
+      possibleAnswers: [],
     };
     const updatedDraftQuestions = [...draftQuestions, newQuestion];
     setDraftQuestions(updatedDraftQuestions);
@@ -82,7 +64,7 @@ export default function QuestionEditor() {
     setEditingIndex(updatedDraftQuestions.length - 1);
     setSelectedQuestionType("MULTIPLECHOICE");
   };
-          
+
   const handleQuestionChange = async (index: number, updatedQuestion: any) => {
     const updatedDraftQuestions = [...draftQuestions];
     updatedDraftQuestions[index] = updatedQuestion;
@@ -90,9 +72,10 @@ export default function QuestionEditor() {
     calculateTotalPoints(updatedDraftQuestions);
   };
 
-
   const handleQuestionDelete = (index: number) => {
-    const updatedDraftQuestions = draftQuestions.filter((_, i) => i !== index);
+    const updatedDraftQuestions = draftQuestions.filter(
+      (_: any, i: number) => i !== index
+    );
     setDraftQuestions(updatedDraftQuestions);
     calculateTotalPoints(updatedDraftQuestions);
     if (editingIndex === index) {
@@ -114,7 +97,7 @@ export default function QuestionEditor() {
   const handleCancel = () => {
     setDraftQuestions(questions);
     setEditingIndex(null);
-
+    navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}`);
   };
 
   const handleSave = async () => {
@@ -137,7 +120,6 @@ export default function QuestionEditor() {
       navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}`);
     } catch (error) {
       console.error(error);
-
     }
   };
 
@@ -169,7 +151,6 @@ export default function QuestionEditor() {
       </div>
       <EditorNavigation />
       <div className="d-flex justify-content-center">
-
         <div className="list-group list-group-flush w-100">
           {draftQuestions.map((question: any, index: number) => (
             <div key={question._id || index} className="list-group-item">
@@ -188,7 +169,9 @@ export default function QuestionEditor() {
                     className="btn btn-sm btn-secondary me-2 ms-5"
                     onClick={() => {
                       setEditingIndex(index);
-                      setSelectedQuestionType(question.questiontype || "MULTIPLECHOICE");
+                      setSelectedQuestionType(
+                        question.questiontype || "MULTIPLECHOICE"
+                      );
                     }}
                   >
                     Edit
@@ -214,7 +197,10 @@ export default function QuestionEditor() {
               className="form-select w-50"
               value={draftQuestions[editingIndex].questiontype}
               onChange={(e) => {
-                const updatedQuestion = { ...draftQuestions[editingIndex], questiontype: e.target.value };
+                const updatedQuestion = {
+                  ...draftQuestions[editingIndex],
+                  questiontype: e.target.value,
+                };
                 handleQuestionChange(editingIndex, updatedQuestion);
                 setSelectedQuestionType(e.target.value);
               }}
