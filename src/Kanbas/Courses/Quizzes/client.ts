@@ -31,3 +31,8 @@ export const findQuizzesByTitle = async (title: string, cId: string) => {
   const response = await axios.get(`${QUIZZES_API}/${cId}?title=${title}`);
   return response.data;
 };
+
+export const findQuizById = async (qid: string) => {
+  const response = await axios.get(`${QUIZZES_API}/${qid}`);
+  return response.data;
+};
