@@ -32,8 +32,7 @@ export default function QuizDetails() {
   };
 
   const handlePreview = () => {
-    // Placeholder for preview
-    console.log("Preview clicked");
+    navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}/preview`);
   };
 
   const handleStart = () => {

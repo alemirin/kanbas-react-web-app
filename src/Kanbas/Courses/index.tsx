@@ -11,6 +11,7 @@ import { Navigate, Route, Routes, useParams, useLocation } from "react-router";
 import { FaAlignJustify } from "react-icons/fa6";
 import QuizDetails from "./Quizzes/QuizDetails";
 import QuestionEditor from "./Quizzes/Questions/QuestionEditor";
+import QuizPreview from "./Quizzes/QuizPreview";
 import * as quizClient from "./Quizzes/client";
 
 export default function Courses({ courses }: { courses: any[] }) {
@@ -74,6 +75,14 @@ export default function Courses({ courses }: { courses: any[] }) {
               element={
                 <FacultyRoute>
                   <QuestionEditor />
+                </FacultyRoute>
+              }
+            />
+            <Route
+              path="Quizzes/:qid/preview"
+              element={
+                <FacultyRoute>
+                  <QuizPreview />
                 </FacultyRoute>
               }
             />
