@@ -1,10 +1,36 @@
+
+import React, { useState, useEffect } from 'react';
 import EditorNavigation from "../EditorNavigation";
 import { useParams, useNavigate } from "react-router";
-import { useState, useEffect } from "react";
+
 import { useLocation } from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
 import * as questionClient from "./client";
 import * as quizClient from "../client";
+
+
+import MultipleChoiceEditor from "./MultipleChoiceEditor";
+import TrueFalseEditor from "./TrueFalseEditor";
+import FillInTheBlankEditor from "./FillInTheBlankEditor";
+
+export default function QuestionEditor() {
+  const { cid, qid } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [quizId, setQuizId] = useState(qid);
+  const [showPopup, setShowPopup] = useState(false);
+
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [draftQuestions, setDraftQuestions] = useState<any[]>([]);
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [selectedQuestionType, setSelectedQuestionType] = useState<string>("MULTIPLECHOICE");
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const data = await questionClient.fetchQuestionsForQuiz(qid!);
 
 export default function QuestionEditor() {
   const { cid, qid } = useParams();
@@ -25,6 +51,7 @@ export default function QuestionEditor() {
         setDraftQuestions(data);
         calculateTotalPoints(data);
       } catch (error) {
+        console.error(error);
         console.error("Error fetching questions:", error);
       }
     };
@@ -34,19 +61,28 @@ export default function QuestionEditor() {
     }
   }, [qid, location]);
 
-  const addNewQuestion = async () => {
+
+  const calculateTotalPoints = (qs: any[]) => {
+    const points = qs.reduce((sum, q) => sum + (q.points || 0), 0);
+    setTotalPoints(points);
+  };
+
+  const addNewQuestion = () => {
     const newQuestion = {
       title: "",
       questiontype: "MULTIPLECHOICE",
       question: "",
       points: 0,
       choices: [],
+      possibleAnswers: []
     };
     const updatedDraftQuestions = [...draftQuestions, newQuestion];
     setDraftQuestions(updatedDraftQuestions);
     calculateTotalPoints(updatedDraftQuestions);
+    setEditingIndex(updatedDraftQuestions.length - 1);
+    setSelectedQuestionType("MULTIPLECHOICE");
   };
-
+          
   const handleQuestionChange = async (index: number, updatedQuestion: any) => {
     const updatedDraftQuestions = [...draftQuestions];
     updatedDraftQuestions[index] = updatedQuestion;
@@ -54,53 +90,54 @@ export default function QuestionEditor() {
     calculateTotalPoints(updatedDraftQuestions);
   };
 
-  const handleQuestionDelete = async (index: Number) => {
-    const updatedDraftQuestions = draftQuestions.filter(
-      (_: any, i: number) => i !== index
-    );
+
+  const handleQuestionDelete = (index: number) => {
+    const updatedDraftQuestions = draftQuestions.filter((_, i) => i !== index);
     setDraftQuestions(updatedDraftQuestions);
     calculateTotalPoints(updatedDraftQuestions);
+    if (editingIndex === index) {
+      setEditingIndex(null);
+    }
   };
 
-  const calculateTotalPoints = (questions: any[]) => {
-    const points = questions.reduce((sum, q) => sum + q.points, 0);
-    setTotalPoints(points);
+  const handleEditorSave = (updatedQuestion: any) => {
+    if (editingIndex !== null) {
+      handleQuestionChange(editingIndex, updatedQuestion);
+      setEditingIndex(null);
+    }
+  };
+
+  const handleEditorCancel = () => {
+    setEditingIndex(null);
   };
 
   const handleCancel = () => {
     setDraftQuestions(questions);
-    navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}`);
+    setEditingIndex(null);
+
   };
 
   const handleSave = async () => {
     try {
-      // Save all draftQuestions to the backend
       for (const question of draftQuestions) {
         if (question._id) {
-          // Update existing questions
           await questionClient.updateQuestion(qid!, question);
         } else {
-          // Create new questions
           await questionClient.createQuestionForQuiz(qid!, question);
         }
       }
-
-      // Remove deleted questions from the backend
       const deletedQuestions = questions.filter(
         (q: any) => !draftQuestions.find((dq: any) => dq._id === q._id)
       );
       for (const question of deletedQuestions) {
         await questionClient.deleteQuestion(qid!, question._id);
       }
-
-      // Update local state to reflect saved changes
       setQuestions(draftQuestions);
-      console.log("Questions successfully saved:", draftQuestions);
-
-      // Navigate back to the quiz details page
+      setEditingIndex(null);
       navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}`);
     } catch (error) {
-      console.error("Error saving questions:", error);
+      console.error(error);
+
     }
   };
 
@@ -132,9 +169,10 @@ export default function QuestionEditor() {
       </div>
       <EditorNavigation />
       <div className="d-flex justify-content-center">
-        <div className="list-group list-group-flush">
+
+        <div className="list-group list-group-flush w-100">
           {draftQuestions.map((question: any, index: number) => (
-            <div key={question._id} className="list-group-item">
+            <div key={question._id || index} className="list-group-item">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
                   <h5>{question.title || `Question ${index + 1}`}</h5>
@@ -148,12 +186,10 @@ export default function QuestionEditor() {
                 <div>
                   <button
                     className="btn btn-sm btn-secondary me-2 ms-5"
-                    onClick={() =>
-                      handleQuestionChange(index, {
-                        ...question,
-                        title: "Updated Title",
-                      })
-                    }
+                    onClick={() => {
+                      setEditingIndex(index);
+                      setSelectedQuestionType(question.questiontype || "MULTIPLECHOICE");
+                    }}
                   >
                     Edit
                   </button>
@@ -169,13 +205,56 @@ export default function QuestionEditor() {
           ))}
         </div>
       </div>
+
+      {editingIndex !== null && (
+        <div className="my-4">
+          <div className="mb-3">
+            <label className="form-label">Question Type</label>
+            <select
+              className="form-select w-50"
+              value={draftQuestions[editingIndex].questiontype}
+              onChange={(e) => {
+                const updatedQuestion = { ...draftQuestions[editingIndex], questiontype: e.target.value };
+                handleQuestionChange(editingIndex, updatedQuestion);
+                setSelectedQuestionType(e.target.value);
+              }}
+            >
+              <option value="MULTIPLECHOICE">Multiple Choice</option>
+              <option value="TRUEORFALSE">True/False</option>
+              <option value="FILLINTHEBLANK">Fill in the Blank</option>
+            </select>
+          </div>
+
+          {selectedQuestionType === "MULTIPLECHOICE" && (
+            <MultipleChoiceEditor
+              initialQuestion={draftQuestions[editingIndex]}
+              onSave={handleEditorSave}
+              onCancel={handleEditorCancel}
+            />
+          )}
+          {selectedQuestionType === "TRUEORFALSE" && (
+            <TrueFalseEditor
+              initialQuestion={draftQuestions[editingIndex]}
+              onSave={handleEditorSave}
+              onCancel={handleEditorCancel}
+            />
+          )}
+          {selectedQuestionType === "FILLINTHEBLANK" && (
+            <FillInTheBlankEditor
+              initialQuestion={draftQuestions[editingIndex]}
+              onSave={handleEditorSave}
+              onCancel={handleEditorCancel}
+            />
+          )}
+        </div>
+      )}
+
       <div className="d-flex justify-content-center mt-3">
         <button className="btn btn-md btn-secondary" onClick={addNewQuestion}>
           + New Question
         </button>
       </div>
       <hr />
-      {/* Action Buttons */}
       <div className="d-flex justify-content-center mt-4">
         <button className="btn btn-secondary me-2" onClick={handleCancel}>
           Cancel
