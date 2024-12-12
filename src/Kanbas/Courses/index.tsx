@@ -11,10 +11,12 @@ import { Navigate, Route, Routes, useParams, useLocation } from "react-router";
 import { FaAlignJustify } from "react-icons/fa6";
 import QuizDetails from "./Quizzes/QuizDetails";
 import QuestionEditor from "./Quizzes/Questions/QuestionEditor";
+import * as quizClient from "./Quizzes/client";
 
 export default function Courses({ courses }: { courses: any[] }) {
   const { cid } = useParams();
   const course = courses.find((course) => course._id === cid);
+
   const { pathname } = useLocation();
   return (
     <div id="wd-courses">
