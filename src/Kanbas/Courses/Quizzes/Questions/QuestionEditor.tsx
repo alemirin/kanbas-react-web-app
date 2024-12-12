@@ -150,8 +150,17 @@ export default function QuestionEditor() {
         <h4>Total Points: {totalPoints}</h4>
       </div>
       <EditorNavigation />
-      <div className="d-flex justify-content-center">
-        <div className="list-group list-group-flush w-100">
+      <div
+        className="d-flex mt-4"
+        style={{ minHeight: "500px", display: "flex" }}
+      >
+        <div
+          className="list-group me-3"
+          style={{
+            width: editingIndex === null ? "100%" : "35%",
+            transition: "width 0.3s ease",
+          }}
+        >
           {draftQuestions.map((question: any, index: number) => (
             <div key={question._id || index} className="list-group-item">
               <div className="d-flex justify-content-between align-items-center">
@@ -187,53 +196,59 @@ export default function QuestionEditor() {
             </div>
           ))}
         </div>
-      </div>
 
-      {editingIndex !== null && (
-        <div className="my-4">
-          <div className="mb-3">
-            <label className="form-label">Question Type</label>
-            <select
-              className="form-select w-50"
-              value={draftQuestions[editingIndex].questiontype}
-              onChange={(e) => {
-                const updatedQuestion = {
-                  ...draftQuestions[editingIndex],
-                  questiontype: e.target.value,
-                };
-                handleQuestionChange(editingIndex, updatedQuestion);
-                setSelectedQuestionType(e.target.value);
-              }}
-            >
-              <option value="MULTIPLECHOICE">Multiple Choice</option>
-              <option value="TRUEORFALSE">True/False</option>
-              <option value="FILLINTHEBLANK">Fill in the Blank</option>
-            </select>
+        {editingIndex !== null && (
+          <div
+            className="ps-3"
+            style={{
+              width: "65%",
+              transition: "width 0.3s ease",
+            }}
+          >
+            <div className="mb-3">
+              <label className="form-label">Question Type</label>
+              <select
+                className="form-select w-50"
+                value={draftQuestions[editingIndex].questiontype}
+                onChange={(e) => {
+                  const updatedQuestion = {
+                    ...draftQuestions[editingIndex],
+                    questiontype: e.target.value,
+                  };
+                  handleQuestionChange(editingIndex, updatedQuestion);
+                  setSelectedQuestionType(e.target.value);
+                }}
+              >
+                <option value="MULTIPLECHOICE">Multiple Choice</option>
+                <option value="TRUEORFALSE">True/False</option>
+                <option value="FILLINTHEBLANK">Fill in the Blank</option>
+              </select>
+            </div>
+
+            {selectedQuestionType === "MULTIPLECHOICE" && (
+              <MultipleChoiceEditor
+                initialQuestion={draftQuestions[editingIndex]}
+                onSave={handleEditorSave}
+                onCancel={handleEditorCancel}
+              />
+            )}
+            {selectedQuestionType === "TRUEORFALSE" && (
+              <TrueFalseEditor
+                initialQuestion={draftQuestions[editingIndex]}
+                onSave={handleEditorSave}
+                onCancel={handleEditorCancel}
+              />
+            )}
+            {selectedQuestionType === "FILLINTHEBLANK" && (
+              <FillInTheBlankEditor
+                initialQuestion={draftQuestions[editingIndex]}
+                onSave={handleEditorSave}
+                onCancel={handleEditorCancel}
+              />
+            )}
           </div>
-
-          {selectedQuestionType === "MULTIPLECHOICE" && (
-            <MultipleChoiceEditor
-              initialQuestion={draftQuestions[editingIndex]}
-              onSave={handleEditorSave}
-              onCancel={handleEditorCancel}
-            />
-          )}
-          {selectedQuestionType === "TRUEORFALSE" && (
-            <TrueFalseEditor
-              initialQuestion={draftQuestions[editingIndex]}
-              onSave={handleEditorSave}
-              onCancel={handleEditorCancel}
-            />
-          )}
-          {selectedQuestionType === "FILLINTHEBLANK" && (
-            <FillInTheBlankEditor
-              initialQuestion={draftQuestions[editingIndex]}
-              onSave={handleEditorSave}
-              onCancel={handleEditorCancel}
-            />
-          )}
-        </div>
-      )}
+        )}
+      </div>
 
       <div className="d-flex justify-content-center mt-3">
         <button className="btn btn-md btn-secondary" onClick={addNewQuestion}>
