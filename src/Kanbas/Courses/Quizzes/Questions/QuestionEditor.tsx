@@ -36,8 +36,6 @@ export default function QuestionEditor() {
       }
     };
     fetchQuestions();
-
-    // If qid is "undefined", show a popup
     if (qid === "undefined") {
       setShowPopup(true);
     }
@@ -120,53 +118,6 @@ export default function QuestionEditor() {
     }
   };
 
-  const renderEditor = () => {
-    if (editingIndex === null) return null;
-    const question = draftQuestions[editingIndex];
-    return (
-      <div className="my-4">
-        <div className="mb-3">
-          <label className="form-label">Question Type</label>
-          <select
-            className="form-select w-50"
-            value={question.questiontype}
-            onChange={(e) => {
-              const updatedQuestion = { ...question, questiontype: e.target.value };
-              handleQuestionChange(editingIndex, updatedQuestion);
-              setSelectedQuestionType(e.target.value);
-            }}
-          >
-            <option value="MULTIPLECHOICE">Multiple Choice</option>
-            <option value="TRUEORFALSE">True/False</option>
-            <option value="FILLINTHEBLANK">Fill in the Blank</option>
-          </select>
-        </div>
-
-        {selectedQuestionType === "MULTIPLECHOICE" && (
-          <MultipleChoiceEditor
-            initialQuestion={question}
-            onSave={handleEditorSave}
-            onCancel={handleEditorCancel}
-          />
-        )}
-        {selectedQuestionType === "TRUEORFALSE" && (
-          <TrueFalseEditor
-            initialQuestion={question}
-            onSave={handleEditorSave}
-            onCancel={handleEditorCancel}
-          />
-        )}
-        {selectedQuestionType === "FILLINTHEBLANK" && (
-          <FillInTheBlankEditor
-            initialQuestion={question}
-            onSave={handleEditorSave}
-            onCancel={handleEditorCancel}
-          />
-        )}
-      </div>
-    );
-  };
-
   const handleClosePopup = () => {
     setShowPopup(false);
   };
@@ -226,7 +177,50 @@ export default function QuestionEditor() {
           ))}
         </div>
       </div>
-      {renderEditor()}
+
+      {editingIndex !== null && (
+        <div className="my-4">
+          <div className="mb-3">
+            <label className="form-label">Question Type</label>
+            <select
+              className="form-select w-50"
+              value={draftQuestions[editingIndex].questiontype}
+              onChange={(e) => {
+                const updatedQuestion = { ...draftQuestions[editingIndex], questiontype: e.target.value };
+                handleQuestionChange(editingIndex, updatedQuestion);
+                setSelectedQuestionType(e.target.value);
+              }}
+            >
+              <option value="MULTIPLECHOICE">Multiple Choice</option>
+              <option value="TRUEORFALSE">True/False</option>
+              <option value="FILLINTHEBLANK">Fill in the Blank</option>
+            </select>
+          </div>
+
+          {selectedQuestionType === "MULTIPLECHOICE" && (
+            <MultipleChoiceEditor
+              initialQuestion={draftQuestions[editingIndex]}
+              onSave={handleEditorSave}
+              onCancel={handleEditorCancel}
+            />
+          )}
+          {selectedQuestionType === "TRUEORFALSE" && (
+            <TrueFalseEditor
+              initialQuestion={draftQuestions[editingIndex]}
+              onSave={handleEditorSave}
+              onCancel={handleEditorCancel}
+            />
+          )}
+          {selectedQuestionType === "FILLINTHEBLANK" && (
+            <FillInTheBlankEditor
+              initialQuestion={draftQuestions[editingIndex]}
+              onSave={handleEditorSave}
+              onCancel={handleEditorCancel}
+            />
+          )}
+        </div>
+      )}
+
       <div className="d-flex justify-content-center mt-3">
         <button className="btn btn-md btn-secondary" onClick={addNewQuestion}>
           + New Question
