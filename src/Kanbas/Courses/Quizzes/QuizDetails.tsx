@@ -54,52 +54,69 @@ export default function QuizDetails() {
       </div>
       <hr />
       <h2 className="fw-bold text-start mt-3">{quiz.title}</h2>
-  
+
       <FacultyRoute>
-        <div className="mt-4">
-          <div className="mb-3">
-            <strong>Quiz Type:</strong> {quiz.quiztype}
-          </div>
-          <div className="mb-3">
-            <strong>Points:</strong> {quiz.points}
-          </div>
-          <div className="mb-3">
-            <strong>Assignment Group:</strong> {quiz.group}
-          </div>
-          <div className="mb-3">
-            <strong>Shuffle Answers:</strong> {quiz.shuffle ? "Yes" : "No"}
-          </div>
-          <div className="mb-3">
-            <strong>Time Limit:</strong> {quiz.isTimed ? `${quiz.time} Minutes` : "No time limit"}
-          </div>
-          <div className="mb-3">
-            <strong>Multiple Attempts:</strong> {quiz.hasMultipleAttempts ? "Yes" : "No"}
-          </div>
-          {quiz.hasMultipleAttempts && (
-            <div className="mb-3">
-              <strong>Number of Attempts:</strong> {quiz.attempts || 1}
-            </div>
-          )}
-          <div className="mb-3">
-            <strong>Show Correct Answers:</strong> {quiz.showCorrect ? "Yes" : "No"}
-          </div>
-          {quiz.needsCode && (
-            <div className="mb-3">
-              <strong>Access Code Required:</strong> {quiz.accessCode}
-            </div>
-          )}
-          <div className="mb-3">
-            <strong>One Question at a Time:</strong> {quiz.oneAtATime ? "Yes" : "No"}
-          </div>
-          <div className="mb-3">
-            <strong>Webcam Required:</strong> {quiz.webcamRequired ? "Yes" : "No"}
-          </div>
-          <div className="mb-3">
-            <strong>Lock Questions:</strong> {quiz.lockQuestions ? "Yes" : "No"}
+        <div className="row mt-4">
+          <div className="col-md-8">
+            <dl className="row">
+              <dt className="col-sm-4 text-end">Quiz Type:</dt>
+              <dd className="col-sm-8">
+                {quiz.quiztype.charAt(0).toUpperCase() +
+                  quiz.quiztype.slice(1).toLowerCase()}
+              </dd>
+
+              <dt className="col-sm-4 text-end">Points:</dt>
+              <dd className="col-sm-8">{quiz.points}</dd>
+
+              <dt className="col-sm-4 text-end">Assignment Group:</dt>
+              <dd className="col-sm-8">
+                {quiz.group.charAt(0).toUpperCase() +
+                  quiz.group.slice(1).toLowerCase()}
+              </dd>
+
+              <dt className="col-sm-4 text-end">Shuffle Answers:</dt>
+              <dd className="col-sm-8">{quiz.shuffle ? "Yes" : "No"}</dd>
+
+              <dt className="col-sm-4 text-end">Time Limit:</dt>
+              <dd className="col-sm-8">
+                {quiz.isTimed ? `${quiz.time} Minutes` : "No time limit"}
+              </dd>
+
+              <dt className="col-sm-4 text-end">Multiple Attempts:</dt>
+              <dd className="col-sm-8">
+                {quiz.hasMultipleAttempts ? "Yes" : "No"}
+              </dd>
+
+              {quiz.hasMultipleAttempts && (
+                <>
+                  <dt className="col-sm-4 text-end">Number of Attempts:</dt>
+                  <dd className="col-sm-8">{quiz.attempts || 1}</dd>
+                </>
+              )}
+
+              <dt className="col-sm-4 text-end">Show Correct Answers:</dt>
+              <dd className="col-sm-8">{quiz.showCorrect ? "Yes" : "No"}</dd>
+
+              {quiz.needsCode && (
+                <>
+                  <dt className="col-sm-4 text-end">Access Code Required:</dt>
+                  <dd className="col-sm-8">{quiz.accessCode}</dd>
+                </>
+              )}
+
+              <dt className="col-sm-4 text-end">One Question at a Time:</dt>
+              <dd className="col-sm-8">{quiz.oneAtATime ? "Yes" : "No"}</dd>
+
+              <dt className="col-sm-4 text-end">Webcam Required:</dt>
+              <dd className="col-sm-8">{quiz.webcamRequired ? "Yes" : "No"}</dd>
+
+              <dt className="col-sm-4 text-end">Lock Questions:</dt>
+              <dd className="col-sm-8">{quiz.lockQuestions ? "Yes" : "No"}</dd>
+            </dl>
           </div>
         </div>
       </FacultyRoute>
-  
+
       <StudentRoute>
         <div className="d-flex justify-content-center mt-4">
           <button onClick={handleStart} className="btn btn-primary">
@@ -107,7 +124,7 @@ export default function QuizDetails() {
           </button>
         </div>
       </StudentRoute>
-  
+
       <div className="table-responsive mt-4">
         <table className="table">
           <thead>
@@ -130,4 +147,4 @@ export default function QuizDetails() {
       </div>
     </div>
   );
-}  
+}

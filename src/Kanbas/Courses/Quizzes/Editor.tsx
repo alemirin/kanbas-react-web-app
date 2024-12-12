@@ -4,12 +4,23 @@ import { useState, useEffect } from "react";
 import { RootState } from "../../store";
 import * as quizClient from "./client";
 import { addQuiz, updateQuiz, setQuizzes } from "./reducer";
+import EditorNavigation from "./EditorNavigation";
 
 export default function QuizEditor() {
   const { cid, qid } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isNew = !qid;
+  var courseId = "";
+  var quizId = "";
+
+  if (cid) {
+    courseId = cid;
+  }
+
+  if (qid) {
+    quizId = qid;
+  }
 
   const fetchQuizzes = async () => {
     const quizzes = await quizClient.fetchQuizzesForCourse(cid as string);
@@ -112,7 +123,8 @@ export default function QuizEditor() {
   };
 
   return (
-    <div id="wd-assignments-editor" className="container mt-4">
+    <div id="wd-quizzes-editor" className="container mt-4">
+      <EditorNavigation cid={courseId} qid={quizId} />
       <div className="mb-3">
         <label htmlFor="wd-name" className="form-label">
           <h4>Quiz Name</h4>
