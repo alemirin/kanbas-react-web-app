@@ -1,21 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router";
+import * as quizClient from "./client";
+import * as questionClient from "./Questions/client";
 
 export default function QuizPreview() {
+  const { cid, qid } = useParams();
+  const [quiz, setQuiz] = useState<any>(null);
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchQuizData = async () => {
+      try {
+        // Fetch the quiz details
+        const fetchedQuiz = await quizClient.findQuizById(qid as string);
+        setQuiz(fetchedQuiz);
+
+        // Fetch questions for the quiz
+        const fetchedQuestions = await questionClient.fetchQuestionsForQuiz(
+          qid as string
+        );
+        setQuestions(fetchedQuestions);
+      } catch (error) {
+        console.error("Error fetching quiz or questions:", error);
+      }
+    };
+
+    fetchQuizData();
+  }, [qid]);
 
   const handleAnswerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedAnswer(event.target.value);
   };
 
+  // Handle "Next" button click
+  const handleNextQuestion = () => {
+    setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+    setSelectedAnswer(null); // Reset selected answer
+  };
+
+  if (!quiz || questions.length === 0) {
+    return <div>Loading...</div>;
+  }
+
+  const currentQuestion = questions[currentQuestionIndex];
+
   return (
     <div
       style={{
-        maxWidth: "600px",
+        maxWidth: "800px",
         margin: "0 auto",
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <h1>Q1 - HTML</h1>
+      <h1>{quiz.title}</h1>
       <div
         style={{
           padding: "10px",
@@ -29,10 +68,6 @@ export default function QuizPreview() {
           ⚠ This is a preview of the published version of the quiz
         </strong>
       </div>
-      <p>
-        <strong>Started:</strong> Nov 29 at 8:19am
-      </p>
-      <h2>Quiz Instructions</h2>
 
       <div
         style={{
@@ -43,84 +78,107 @@ export default function QuizPreview() {
         }}
       >
         <h3>
-          Question 1 <span style={{ float: "right" }}>1 pts</span>
+          Question {currentQuestionIndex + 1}{" "}
+          <span style={{ float: "right" }}>{currentQuestion.points} pts</span>
         </h3>
-        <p>
-          An HTML <code>label</code> element can be associated with an HTML{" "}
-          <code>input</code> element by setting their <code>id</code> attributes
-          to the same value.
-        </p>
-        <p>
-          The resulting effect is that when you click on the <code>label</code>{" "}
-          text, the <code>input</code> element receives focus as if you had
-          clicked on the <code>input</code> element itself.
-        </p>
-        <div>
-          <label>
-            <input
-              type="radio"
-              name="question1"
-              value="True"
-              checked={selectedAnswer === "True"}
-              onChange={handleAnswerChange}
-            />
-            True
-          </label>
-        </div>
-        <div>
-          <label>
-            <input
-              type="radio"
-              name="question1"
-              value="False"
-              checked={selectedAnswer === "False"}
-              onChange={handleAnswerChange}
-            />
-            False
-          </label>
-        </div>
+        <p>{currentQuestion.question}</p>
+
+        {currentQuestion.questiontype === "MULTIPLECHOICE" &&
+          currentQuestion.choices.map((choice: any, index: number) => (
+            <div key={index}>
+              <label>
+                <input
+                  type="radio"
+                  name={`question-${currentQuestionIndex}`}
+                  value={choice.text}
+                  checked={selectedAnswer === choice.text}
+                  onChange={handleAnswerChange}
+                />
+                {choice.text}
+              </label>
+            </div>
+          ))}
+
+        {currentQuestion.questiontype === "TRUEORFALSE" && (
+          <>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name={`question-${currentQuestionIndex}`}
+                  value="True"
+                  checked={selectedAnswer === "True"}
+                  onChange={handleAnswerChange}
+                />
+                True
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name={`question-${currentQuestionIndex}`}
+                  value="False"
+                  checked={selectedAnswer === "False"}
+                  onChange={handleAnswerChange}
+                />
+                False
+              </label>
+            </div>
+          </>
+        )}
+
+        {currentQuestion.questiontype === "FILLINTHEBLANK" && (
+          <div>
+            <label>
+              <input
+                type="text"
+                placeholder="Enter your answer here"
+                value={selectedAnswer || ""}
+                onChange={(e) => setSelectedAnswer(e.target.value)}
+              />
+            </label>
+          </div>
+        )}
+
         <div style={{ marginTop: "15px" }}>
-          <button className="btn btn-secondary">Next</button>
+          {currentQuestionIndex < questions.length - 1 ? (
+            <button
+              className="btn btn-secondary"
+              onClick={handleNextQuestion}
+              disabled={!selectedAnswer}
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              className="btn btn-danger"
+              onClick={() => console.log("Submit quiz")}
+              disabled={!selectedAnswer}
+            >
+              Submit Quiz
+            </button>
+          )}
         </div>
       </div>
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px",
-        }}
-      >
-        <p>
-          <strong>Quiz saved at 8:19am</strong>
-        </p>
-        <button className="btn btn-danger">Submit Quiz</button>
-      </div>
-
-      <button className="btn btn-secondary">Keep Editing This Quiz</button>
-
-      <br />
 
       <div>
-        <br />
         <h3>Questions</h3>
         <ul>
-          <li>
-            <a href="#">Question 1</a>
-          </li>
-          <li>
-            <a href="#">Question 2</a>
-          </li>
-          <li>
-            <a href="#">Question 3</a>
-          </li>
-          <li>
-            <a href="#">Question 4</a>
-          </li>
-          <li>
-            <a href="#">Question 5</a>
-          </li>
+          {questions.map((q, index) => (
+            <li key={q._id}>
+              <a
+                href="#"
+                onClick={() => setCurrentQuestionIndex(index)}
+                style={{
+                  fontWeight:
+                    index === currentQuestionIndex ? "bold" : "normal",
+                }}
+              >
+                Question {index + 1}
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
     </div>
