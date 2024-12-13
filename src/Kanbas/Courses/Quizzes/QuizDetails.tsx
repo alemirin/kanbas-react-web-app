@@ -36,21 +36,22 @@ export default function QuizDetails() {
   };
 
   const handleStart = () => {
-    // Placeholder for start quiz
-    console.log("Start quiz clicked");
+    navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}/preview`);
   };
 
   return (
     <div className="container mt-4">
-      <div className="d-flex justify-content-center gap-3">
-        <button onClick={handlePreview} className="btn btn-secondary">
-          Preview
-        </button>
-        <button onClick={handleEdit} className="btn btn-primary">
-          <FaPencil className="me-2" />
-          Edit
-        </button>
-      </div>
+      <FacultyRoute>
+        <div className="d-flex justify-content-center gap-3">
+          <button onClick={handlePreview} className="btn btn-secondary">
+            Preview
+          </button>
+          <button onClick={handleEdit} className="btn btn-primary">
+            <FaPencil className="me-2" />
+            Edit
+          </button>
+        </div>
+      </FacultyRoute>
       <hr />
       <h2 className="fw-bold text-start mt-3">{quiz.title}</h2>
 
@@ -129,17 +130,17 @@ export default function QuizDetails() {
           <thead>
             <tr>
               <th>Due</th>
-              <th>For</th>
               <th>Available From</th>
               <th>Available Until</th>
+              <th>Points</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>{quiz.due || "No due date"}</td>
-              <td>Everyone</td>
               <td>{quiz.availFrom || "No date set"}</td>
               <td>{quiz.availUntil || "No date set"}</td>
+              <td>{quiz.points}</td>
             </tr>
           </tbody>
         </table>
