@@ -6,13 +6,12 @@ import Assignments from "./Assignments";
 import AssignmentEditor from "./Assignments/Editor";
 import Quizzes from "./Quizzes";
 import QuizEditor from "./Quizzes/Editor";
+import QuizPreview from "./Quizzes/QuizPreview";
 import PeopleTable from "./People/Table";
 import { Navigate, Route, Routes, useParams, useLocation } from "react-router";
 import { FaAlignJustify } from "react-icons/fa6";
 import QuizDetails from "./Quizzes/QuizDetails";
 import QuestionEditor from "./Quizzes/Questions/QuestionEditor";
-import QuizPreview from "./Quizzes/QuizPreview";
-import * as quizClient from "./Quizzes/client";
 
 export default function Courses({ courses }: { courses: any[] }) {
   const { cid } = useParams();
@@ -78,14 +77,7 @@ export default function Courses({ courses }: { courses: any[] }) {
                 </FacultyRoute>
               }
             />
-            <Route
-              path="Quizzes/:qid/preview"
-              element={
-                <FacultyRoute>
-                  <QuizPreview />
-                </FacultyRoute>
-              }
-            />
+            <Route path="Quizzes/:qid/preview" element={<QuizPreview />} />
             <Route path="People" element={<PeopleTable />} />
           </Routes>
         </div>

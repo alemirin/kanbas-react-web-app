@@ -4,6 +4,8 @@ import * as quizClient from "./client";
 import * as questionClient from "./Questions/client";
 import * as answersClient from "./Answers/client";
 import * as usersClient from "../../Account/client";
+import FacultyRoute from "../../Account/FacultyRoute";
+import { useSelector } from "react-redux";
 
 export default function QuizPreview() {
   const { cid, qid } = useParams();
@@ -14,21 +16,7 @@ export default function QuizPreview() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [answers, setAnswers] = useState<any[]>([]);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-
-  // Fetch user profile to get userId
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const userProfile = await usersClient.profile();
-        setUserId(userProfile._id); // Assuming the user profile has an `_id` field
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      }
-    };
-
-    fetchUserProfile();
-  }, []);
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
 
   useEffect(() => {
     const fetchQuizData = async () => {
@@ -62,7 +50,7 @@ export default function QuizPreview() {
 
       return () => clearInterval(timer);
     } else if (timeRemaining === 0) {
-      handleSubmit(); // Submit quiz when timer expires
+      handleSubmit();
     }
   }, [timeRemaining]);
 
@@ -82,19 +70,16 @@ export default function QuizPreview() {
       let isCorrect = false;
 
       if (currentQuestion.questiontype === "MULTIPLECHOICE") {
-        // For multiple choice, check if the selected answer matches a correct choice
         isCorrect = currentQuestion.choices?.some(
           (choice: any) =>
             String(choice.text).toLowerCase() ===
               String(selectedAnswer).toLowerCase() && choice.isCorrect
         );
       } else if (currentQuestion.questiontype === "TRUEORFALSE") {
-        // For true/false, compare the selected answer with the correctAnswer field
         isCorrect =
           String(currentQuestion.correctAnswer).toLowerCase() ===
           String(selectedAnswer).toLowerCase();
       } else if (currentQuestion.questiontype === "FILLINTHEBLANK") {
-        // For fill in the blank, compare against possibleAnswers
         isCorrect = currentQuestion.possibleAnswers?.some(
           (answer: string) =>
             String(answer).toLowerCase() ===
@@ -102,9 +87,8 @@ export default function QuizPreview() {
         );
       }
 
-      // Save the answer
-      setAnswers((prevAnswers) => [
-        ...prevAnswers,
+      setAnswers([
+        ...answers,
         {
           questionId: currentQuestion._id,
           question: currentQuestion.question,
@@ -113,16 +97,13 @@ export default function QuizPreview() {
           isCorrect,
         },
       ]);
-    }
 
-    // Move to the next question
-    setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-    setSelectedAnswer(null);
+      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+      setSelectedAnswer(null);
+    }
   };
 
   const handleSubmit = async () => {
-    let updatedAnswers = [...answers];
-    // Save the last question's answer if it exists
     if (selectedAnswer !== null) {
       const currentQuestion = questions[currentQuestionIndex];
       let isCorrect = false;
@@ -145,8 +126,8 @@ export default function QuizPreview() {
         );
       }
 
-      updatedAnswers = [
-        ...updatedAnswers,
+      setAnswers([
+        ...answers,
         {
           questionId: currentQuestion._id,
           question: currentQuestion.question,
@@ -154,25 +135,27 @@ export default function QuizPreview() {
           providedAnswer: selectedAnswer,
           isCorrect,
         },
-      ];
+      ]);
     }
 
-    const correctAnswers = updatedAnswers.filter(
-      (answer) => answer.isCorrect
-    ).length;
-    const totalQuestions = questions.length;
-
-    const payload = {
-      quizId: qid,
-      userId,
-      answers: updatedAnswers,
-    };
+    const finalAnswers = [
+      ...answers,
+      selectedAnswer ? {
+        questionId: questions[currentQuestionIndex]._id,
+        question: questions[currentQuestionIndex].question,
+        questiontype: questions[currentQuestionIndex].questiontype,
+        providedAnswer: selectedAnswer,
+        isCorrect: questions[currentQuestionIndex].correctAnswer === selectedAnswer,
+      } : null,
+    ].filter(Boolean);
 
     try {
-      await answersClient.createQuizAnswer(qid as string, payload);
-      alert(
-        `Quiz submitted! You scored ${correctAnswers} out of ${totalQuestions}.`
-      );
+      await answersClient.createQuizAnswer(qid as string, {
+        quizId: qid,
+        userId: currentUser._id,
+        answers: finalAnswers,
+      });
+      
       navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}`);
     } catch (error) {
       console.error("Error submitting quiz:", error);
@@ -181,9 +164,8 @@ export default function QuizPreview() {
 
   if (!quiz || questions.length === 0) {
     return (
-      <div>
-        Can not retrieve quiz preview data. Please ensure the quiz is created
-        and there are questions in the quiz.
+      <div className="alert alert-warning">
+        No questions available for this quiz.
       </div>
     );
   }
@@ -191,13 +173,7 @@ export default function QuizPreview() {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <div
-      style={{
-        maxWidth: "800px",
-        margin: "0 auto",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
+    <div style={{ maxWidth: "800px", margin: "0 auto" }}>
       {quiz.isTimed && timeRemaining !== null && (
         <div
           style={{
@@ -214,20 +190,24 @@ export default function QuizPreview() {
           Time Remaining: {formatTime(timeRemaining)}
         </div>
       )}
+      
       <h1>{quiz.title}</h1>
-      <div
-        style={{
-          padding: "10px",
-          backgroundColor: "#ffe4e1",
-          border: "1px solid #f5c6cb",
-          borderRadius: "4px",
-          marginBottom: "20px",
-        }}
-      >
-        <strong>
-          ⚠ This is a preview of the published version of the quiz
-        </strong>
-      </div>
+
+      <FacultyRoute>
+        <div
+          style={{
+            padding: "10px",
+            backgroundColor: "#ffe4e1",
+            border: "1px solid #f5c6cb",
+            borderRadius: "4px",
+            marginBottom: "20px",
+          }}
+        >
+          <strong>
+            ⚠ This is a preview of the published version of the quiz
+          </strong>
+        </div>
+      </FacultyRoute>
 
       <div
         style={{
