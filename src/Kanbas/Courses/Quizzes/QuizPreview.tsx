@@ -9,19 +9,24 @@ export default function QuizPreview() {
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
-        // Fetch the quiz details
-        const fetchedQuiz = await quizClient.findQuizById(qid as string);
-        setQuiz(fetchedQuiz);
+        const quizzes = await quizClient.fetchQuizzesForCourse(cid as string);
+        const foundQuiz = quizzes.find((q: any) => q._id === qid);
+        setQuiz(foundQuiz);
 
         // Fetch questions for the quiz
         const fetchedQuestions = await questionClient.fetchQuestionsForQuiz(
           qid as string
         );
         setQuestions(fetchedQuestions);
+
+        if (foundQuiz.isTimed) {
+          setTimeRemaining(foundQuiz.time * 60); // Convert minutes to seconds
+        }
       } catch (error) {
         console.error("Error fetching quiz or questions:", error);
       }
@@ -30,8 +35,25 @@ export default function QuizPreview() {
     fetchQuizData();
   }, [qid]);
 
+  // Timer countdown logic
+  useEffect(() => {
+    if (timeRemaining !== null && timeRemaining > 0) {
+      const timer = setInterval(() => {
+        setTimeRemaining((prev) => (prev !== null ? prev - 1 : null));
+      }, 1000);
+
+      return () => clearInterval(timer); // Cleanup timer
+    }
+  }, [timeRemaining]);
+
   const handleAnswerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedAnswer(event.target.value);
+  };
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
   };
 
   // Handle "Next" button click
@@ -41,7 +63,12 @@ export default function QuizPreview() {
   };
 
   if (!quiz || questions.length === 0) {
-    return <div>Loading...</div>;
+    return (
+      <div>
+        Can not retrieve quiz preview data. Please ensure the quiz is created
+        and there are questions in the quiz.
+      </div>
+    );
   }
 
   const currentQuestion = questions[currentQuestionIndex];
@@ -54,6 +81,22 @@ export default function QuizPreview() {
         fontFamily: "Arial, sans-serif",
       }}
     >
+      {quiz.isTimed && timeRemaining !== null && (
+        <div
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            backgroundColor: "#f8d7da",
+            color: "#721c24",
+            padding: "10px",
+            borderRadius: "5px",
+            fontWeight: "bold",
+          }}
+        >
+          Time Remaining: {formatTime(timeRemaining)}
+        </div>
+      )}
       <h1>{quiz.title}</h1>
       <div
         style={{
