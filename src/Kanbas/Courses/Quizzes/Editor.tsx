@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import { RootState } from "../../store";
 import * as quizClient from "./client";
 import { addQuiz, updateQuiz, setQuizzes } from "./reducer";
 import EditorNavigation from "./EditorNavigation";
