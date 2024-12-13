@@ -1,15 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import * as quizClient from "./client";
 import * as questionClient from "./Questions/client";
+import * as answersClient from "./Answers/client";
+import * as usersClient from "../../Account/client";
 
 export default function QuizPreview() {
   const { cid, qid } = useParams();
+  const navigate = useNavigate();
   const [quiz, setQuiz] = useState<any>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [answers, setAnswers] = useState<any[]>([]);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Fetch user profile to get userId
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const userProfile = await usersClient.profile();
+        setUserId(userProfile._id); // Assuming the user profile has an `_id` field
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   useEffect(() => {
     const fetchQuizData = async () => {
@@ -18,7 +37,6 @@ export default function QuizPreview() {
         const foundQuiz = quizzes.find((q: any) => q._id === qid);
         setQuiz(foundQuiz);
 
-        // Fetch questions for the quiz
         const fetchedQuestions = await questionClient.fetchQuestionsForQuiz(
           qid as string
         );
@@ -42,7 +60,9 @@ export default function QuizPreview() {
         setTimeRemaining((prev) => (prev !== null ? prev - 1 : null));
       }, 1000);
 
-      return () => clearInterval(timer); // Cleanup timer
+      return () => clearInterval(timer);
+    } else if (timeRemaining === 0) {
+      handleSubmit(); // Submit quiz when timer expires
     }
   }, [timeRemaining]);
 
@@ -56,10 +76,107 @@ export default function QuizPreview() {
     return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
   };
 
-  // Handle "Next" button click
   const handleNextQuestion = () => {
+    if (selectedAnswer !== null) {
+      const currentQuestion = questions[currentQuestionIndex];
+      let isCorrect = false;
+
+      if (currentQuestion.questiontype === "MULTIPLECHOICE") {
+        // For multiple choice, check if the selected answer matches a correct choice
+        isCorrect = currentQuestion.choices?.some(
+          (choice: any) =>
+            String(choice.text).toLowerCase() ===
+              String(selectedAnswer).toLowerCase() && choice.isCorrect
+        );
+      } else if (currentQuestion.questiontype === "TRUEORFALSE") {
+        // For true/false, compare the selected answer with the correctAnswer field
+        isCorrect =
+          String(currentQuestion.correctAnswer).toLowerCase() ===
+          String(selectedAnswer).toLowerCase();
+      } else if (currentQuestion.questiontype === "FILLINTHEBLANK") {
+        // For fill in the blank, compare against possibleAnswers
+        isCorrect = currentQuestion.possibleAnswers?.some(
+          (answer: string) =>
+            String(answer).toLowerCase() ===
+            String(selectedAnswer).toLowerCase()
+        );
+      }
+
+      // Save the answer
+      setAnswers((prevAnswers) => [
+        ...prevAnswers,
+        {
+          questionId: currentQuestion._id,
+          question: currentQuestion.question,
+          questiontype: currentQuestion.questiontype,
+          providedAnswer: selectedAnswer,
+          isCorrect,
+        },
+      ]);
+    }
+
+    // Move to the next question
     setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-    setSelectedAnswer(null); // Reset selected answer
+    setSelectedAnswer(null);
+  };
+
+  const handleSubmit = async () => {
+    let updatedAnswers = [...answers];
+    // Save the last question's answer if it exists
+    if (selectedAnswer !== null) {
+      const currentQuestion = questions[currentQuestionIndex];
+      let isCorrect = false;
+
+      if (currentQuestion.questiontype === "MULTIPLECHOICE") {
+        isCorrect = currentQuestion.choices?.some(
+          (choice: any) =>
+            String(choice.text).toLowerCase() ===
+              String(selectedAnswer).toLowerCase() && choice.isCorrect
+        );
+      } else if (currentQuestion.questiontype === "TRUEORFALSE") {
+        isCorrect =
+          String(currentQuestion.correctAnswer).toLowerCase() ===
+          String(selectedAnswer).toLowerCase();
+      } else if (currentQuestion.questiontype === "FILLINTHEBLANK") {
+        isCorrect = currentQuestion.possibleAnswers?.some(
+          (answer: string) =>
+            String(answer).toLowerCase() ===
+            String(selectedAnswer).toLowerCase()
+        );
+      }
+
+      updatedAnswers = [
+        ...updatedAnswers,
+        {
+          questionId: currentQuestion._id,
+          question: currentQuestion.question,
+          questiontype: currentQuestion.questiontype,
+          providedAnswer: selectedAnswer,
+          isCorrect,
+        },
+      ];
+    }
+
+    const correctAnswers = updatedAnswers.filter(
+      (answer) => answer.isCorrect
+    ).length;
+    const totalQuestions = questions.length;
+
+    const payload = {
+      quizId: qid,
+      userId,
+      answers: updatedAnswers,
+    };
+
+    try {
+      await answersClient.createQuizAnswer(qid as string, payload);
+      alert(
+        `Quiz submitted! You scored ${correctAnswers} out of ${totalQuestions}.`
+      );
+      navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}`);
+    } catch (error) {
+      console.error("Error submitting quiz:", error);
+    }
   };
 
   if (!quiz || questions.length === 0) {
@@ -196,7 +313,7 @@ export default function QuizPreview() {
           ) : (
             <button
               className="btn btn-danger"
-              onClick={() => console.log("Submit quiz")}
+              onClick={handleSubmit}
               disabled={!selectedAnswer}
             >
               Submit Quiz
@@ -210,16 +327,20 @@ export default function QuizPreview() {
         <ul>
           {questions.map((q, index) => (
             <li key={q._id}>
-              <a
-                href="#"
+              <button
                 onClick={() => setCurrentQuestionIndex(index)}
                 style={{
                   fontWeight:
                     index === currentQuestionIndex ? "bold" : "normal",
+                  textDecoration: "none",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "gray",
                 }}
               >
                 Question {index + 1}
-              </a>
+              </button>
             </li>
           ))}
         </ul>
