@@ -25,6 +25,13 @@ export const fetchAnswersByUser = async (quizId: string, userId: string) => {
   return data;
 };
 
+export const countAnswersByUser = async (quizId: string, userId: string) => {
+  const { data } = await axios.get(
+    `${REMOTE_SERVER}/api/quizzes/${quizId}/answers/${userId}/count`
+  );
+  return data.count;
+};
+
 export const deleteQuizAnswer = async (answerId: string) => {
   const { data } = await axios.delete(
     `${REMOTE_SERVER}/api/answers/${answerId}`

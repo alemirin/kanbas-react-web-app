@@ -4,12 +4,17 @@ import { useSelector } from "react-redux";
 import FacultyRoute from "../../Account/FacultyRoute";
 import StudentRoute from "../../Account/StudentRoute";
 import { FaPencil } from "react-icons/fa6";
+import { FaCheck, FaTimes } from "react-icons/fa";
 import * as client from "./client";
+import * as answersClient from "./Answers/client";
 
 export default function QuizDetails() {
   const { cid, qid } = useParams();
   const navigate = useNavigate();
   const [quiz, setQuiz] = useState<any>(null);
+  const [previousAttempt, setPreviousAttempt] = useState<any>(null);
+  const [attemptCount, setAttemptCount] = useState(0);
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
 
   const fetchQuiz = async () => {
     try {
@@ -21,9 +26,30 @@ export default function QuizDetails() {
     }
   };
 
+  const fetchAttempts = async () => {
+    try {
+      if (currentUser && qid) {
+        const attempt = await answersClient.fetchAnswersByUser(qid, currentUser._id);
+        const count = await answersClient.countAnswersByUser(qid, currentUser._id);
+        setPreviousAttempt(attempt);
+        setAttemptCount(count);
+      }
+    } catch (error) {
+      console.error("Error fetching attempts:", error);
+    }
+  };
+
   useEffect(() => {
     fetchQuiz();
-  }, [qid]);
+    fetchAttempts();
+  }, [qid, currentUser]);
+
+  const canAttemptQuiz = () => {
+    if (!quiz) return false;
+    if (!quiz.hasMultipleAttempts && attemptCount > 0) return false;
+    if (quiz.hasMultipleAttempts && attemptCount >= quiz.attempts) return false;
+    return true;
+  };
 
   if (!quiz) return null;
 
@@ -118,11 +144,13 @@ export default function QuizDetails() {
       </FacultyRoute>
 
       <StudentRoute>
-        <div className="d-flex justify-content-center mt-4">
-          <button onClick={handleStart} className="btn btn-primary">
-            Start Quiz
-          </button>
-        </div>
+        {canAttemptQuiz() && (
+          <div className="d-flex justify-content-center mt-4">
+            <button onClick={handleStart} className="btn btn-primary">
+              Start Quiz
+            </button>
+          </div>
+        )}
       </StudentRoute>
 
       <div className="table-responsive mt-4">
@@ -145,6 +173,44 @@ export default function QuizDetails() {
           </tbody>
         </table>
       </div>
+
+      <StudentRoute>
+        {previousAttempt && (
+          <div className="mt-4">
+            <h3>Previous Attempt Results</h3>
+            <div className="card">
+              <div className="card-body">
+                <h4>Score: {previousAttempt.score.toFixed(1)}%</h4>
+                <p>Submitted: {new Date(previousAttempt.submittedAt).toLocaleString()}</p>
+                <p>Attempt {previousAttempt.attemptNumber} of {quiz.hasMultipleAttempts ? quiz.attempts : 1}</p>
+                
+                <div className="mt-4">
+                  <h5>Your Answers:</h5>
+                  {previousAttempt.answers.map((answer: any, index: number) => (
+                    <div key={index} 
+                         className={`p-3 mb-3 rounded ${
+                           answer.isCorrect ? 'bg-success-subtle' : 'bg-danger-subtle'
+                         }`}>
+                      <div className="d-flex align-items-center mb-2">
+                        {answer.isCorrect ? (
+                          <FaCheck className="text-success me-2" />
+                        ) : (
+                          <FaTimes className="text-danger me-2" />
+                        )}
+                        <strong>Question {index + 1}:</strong>
+                      </div>
+                      <p className="mb-1">{answer.question}</p>
+                      <p className="mb-0">
+                        <strong>Your answer:</strong> {answer.providedAnswer}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </StudentRoute>
     </div>
   );
 }
