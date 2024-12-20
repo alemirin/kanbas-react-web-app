@@ -45,7 +45,12 @@ export default function Dashboard({
       currentUser._id as string
     );
 
-    dispatch(setEnrollments(enrollments));
+    // Filter out null or undefined entries
+    const validEnrollments = enrollments.filter(
+      (e: any) => e && e.course && e.user
+    );
+
+    dispatch(setEnrollments(validEnrollments));
   };
 
   useEffect(() => {
@@ -79,7 +84,9 @@ export default function Dashboard({
             onClick={async (event) => {
               if (currentUser) {
                 await addNewCourse(currentUser._id, course._id);
-                dispatch(enroll(course._id));
+                dispatch(
+                  enroll({ userId: currentUser._id, courseId: course._id })
+                );
               }
               await fetchEnrollments();
             }}
@@ -163,9 +170,15 @@ export default function Dashboard({
                     </a>
                     <FacultyRoute>
                       <button
-                        onClick={(event) => {
+                        onClick={async (event) => {
                           event.preventDefault();
-                          deleteCourse(course._id);
+                          await deleteCourse(course._id);
+                          dispatch(
+                            unenroll({
+                              userId: currentUser._id,
+                              courseId: course._id,
+                            })
+                          );
                         }}
                         className="btn btn-danger float-end"
                         id="wd-delete-course-click"

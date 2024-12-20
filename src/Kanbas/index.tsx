@@ -26,8 +26,10 @@ export default function Kanbas() {
         const enrolledCourses = await enrollmentsClient.findEnrollmentsForUser(
           currentUser._id
         );
+
+        const filteredCourses = enrolledCourses.filter((c: any) => c !== null);
         const enrolledCourseIds = new Set(
-          enrolledCourses.map((course: any) => course._id.toString())
+          filteredCourses.map((course: any) => course._id.toString())
         );
 
         // Merge enrollment state into all courses
@@ -35,6 +37,7 @@ export default function Kanbas() {
           ...course,
           enrolled: enrolledCourseIds.has(course._id.toString()),
         }));
+
         setCourses(courses);
       } else {
         const allCourses = await courseClient.fetchAllCourses();
@@ -54,7 +57,8 @@ export default function Kanbas() {
         const courses = await enrollmentsClient.findEnrollmentsForUser(
           currentUser._id
         );
-        setCourses(courses);
+        const filteredCourses = courses.filter((c: any) => c !== null);
+        setCourses(filteredCourses);
       }
     } catch (error) {
       console.error(error);
@@ -84,7 +88,7 @@ export default function Kanbas() {
   }, [currentUser, enrolling]);
 
   const [course, setCourse] = useState<any>({
-    _id: "RS500",
+    _id: Date.now().toString(),
     name: "New Course",
     number: "New Number",
     startDate: "2023-09-10",
@@ -94,25 +98,34 @@ export default function Kanbas() {
   });
 
   const addNewCourse = async (uId: string, cId: string) => {
-    // Generate a new unique ID based on the last course's ID
-    const lastCourse = courses[courses.length - 1];
-    const newId = lastCourse
-      ? `RS${parseInt(lastCourse._id.slice(2)) + 1}`
-      : "RS501"; // Start with RS101 if no courses exist
-
-    // Create a new course with the generated ID
     const newCourse = {
       ...course,
-      _id: newId,
     };
     const newCourseObj = await courseClient.createCourse(newCourse);
-    const newEnrollment = userClient.enrollIntoCourse(uId, cId);
+    await userClient.enrollIntoCourse(uId, cId);
     setCourses([...courses, newCourseObj]);
+    // Update the local state for the specific course
+    setCourses((prevCourses) =>
+      prevCourses.map((course) =>
+        course._id === cId ? { ...course, enrolled: true } : course
+      )
+    );
     await fetchCourses();
   };
   const deleteCourse = async (courseId: string) => {
-    const status = await courseClient.deleteCourse(courseId);
-    setCourses(courses.filter((course) => course._id !== courseId));
+    try {
+      const status = await courseClient.deleteCourse(courseId);
+
+      if (status) {
+        setCourses((prevCourses) =>
+          prevCourses.filter((course) => course._id !== courseId)
+        );
+      } else {
+        console.error("Failed to delete course from the backend.");
+      }
+    } catch (error) {
+      console.error("Error deleting course:", error);
+    }
   };
 
   const updateCourse = async () => {
