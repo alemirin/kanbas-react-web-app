@@ -26,8 +26,9 @@ export default function Kanbas() {
         const enrolledCourses = await enrollmentsClient.findEnrollmentsForUser(
           currentUser._id
         );
+        const filteredCourses = enrolledCourses.filter((c: any) => c !== null);
         const enrolledCourseIds = new Set(
-          enrolledCourses.map((course: any) => course._id.toString())
+          filteredCourses.map((course: any) => course._id.toString())
         );
 
         // Merge enrollment state into all courses
@@ -54,7 +55,8 @@ export default function Kanbas() {
         const courses = await enrollmentsClient.findEnrollmentsForUser(
           currentUser._id
         );
-        setCourses(courses);
+        const filteredCourses = courses.filter((c: any) => c !== null);
+        setCourses(filteredCourses);
       }
     } catch (error) {
       console.error(error);
@@ -84,6 +86,7 @@ export default function Kanbas() {
   }, [currentUser, enrolling]);
 
   const [course, setCourse] = useState<any>({
+    _id: Date.now().toString(),
     name: "New Course",
     number: "New Number",
     startDate: "2023-09-10",
@@ -93,14 +96,34 @@ export default function Kanbas() {
   });
 
   const addNewCourse = async (uId: string, cId: string) => {
-    const newCourseObj = await courseClient.createCourse(course);
-    const status = await userClient.enrollIntoCourse(uId, cId);
+    const newCourse = {
+      ...course,
+    };
+    const newCourseObj = await courseClient.createCourse(newCourse);
+    await userClient.enrollIntoCourse(uId, cId);
     setCourses([...courses, newCourseObj]);
-    await findCoursesForUser();
+    // Update the local state for the specific course
+    setCourses((prevCourses) =>
+      prevCourses.map((course) =>
+        course._id === cId ? { ...course, enrolled: true } : course
+      )
+    );
+    await fetchCourses();
   };
   const deleteCourse = async (courseId: string) => {
-    const status = await courseClient.deleteCourse(courseId);
-    setCourses(courses.filter((course) => course._id !== courseId));
+    try {
+      const status = await courseClient.deleteCourse(courseId);
+
+      if (status) {
+        setCourses((prevCourses) =>
+          prevCourses.filter((course) => course._id !== courseId)
+        );
+      } else {
+        console.error("Failed to delete course from the backend.");
+      }
+    } catch (error) {
+      console.error("Error deleting course:", error);
+    }
   };
 
   const updateCourse = async () => {
