@@ -21,7 +21,7 @@ export default function Kanbas() {
 
   const fetchCourses = async () => {
     try {
-      if (currentUser.role != "ADMIN") {
+      if (currentUser.role !== "ADMIN") {
         const allCourses = await courseClient.fetchAllCourses();
         const enrolledCourses = await enrollmentsClient.findEnrollmentsForUser(
           currentUser._id
