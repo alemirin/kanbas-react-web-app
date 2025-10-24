@@ -78,12 +78,14 @@ export default function Kanbas() {
   };
 
   useEffect(() => {
-    if (enrolling) {
-      fetchCourses();
-    } else {
-      findCoursesForUser();
+    if (currentUser?._id) {
+      if (enrolling) {
+        fetchCourses();
+      } else {
+        findCoursesForUser();
+      }
     }
-  }, [currentUser, enrolling]);
+  }, [currentUser?._id, enrolling]);
 
   const [course, setCourse] = useState<any>({
     _id: Date.now().toString(),

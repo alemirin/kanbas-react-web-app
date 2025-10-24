@@ -11,7 +11,7 @@ export const findAllEnrollments = async () => {
 
 export const findEnrollmentsForUser = async (uId: string) => {
   const response = await axiosWithCredentials.get(
-    `${REMOTE_SERVER}/api/${uId}/enrollments`
+    `${REMOTE_SERVER}/api/users/${uId}/courses`
   );
   return response.data;
 };
