@@ -9,8 +9,9 @@ export default function Profile() {
   const navigate = useNavigate();
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const updateProfile = async () => {
-    const updatedProfile = await client.updateUser(profile);
-    dispatch(setCurrentUser(updatedProfile));
+    await client.updateUser(profile);
+    const updatedUser = await client.profile();
+    dispatch(setCurrentUser(updatedUser));
   };
 
   const fetchProfile = () => {
@@ -88,6 +89,7 @@ export default function Profile() {
           <select
             id="wd-role"
             className="form-control mb-2"
+            value={profile.role}
             onChange={(e) => setProfile({ ...profile, role: e.target.value })}
           >
             <option value="USER">User</option>
